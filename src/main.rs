@@ -35,7 +35,7 @@ pub fn main() {
         .set_logical_size(500, 500)
         .expect("Could not set logical size");
 
-    let texture_creator = canvas.texture_creator();
+    // let texture_creator = canvas.texture_creator();
 
     let mut event_pump = sdl_context
         .event_pump()
@@ -76,26 +76,9 @@ pub fn main() {
                     _ => {}
                 },
                 // Handle quitting keys or window close
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::Escape) | Some(Keycode::Q),
-                    ..
-                } => {
+                Event::Quit { .. }  => {
                     event!(tracing::Level::INFO, "Exit requested. Exiting...");
                     return false;
-                }
-                Event::KeyDown {
-                    keycode: Some(Keycode::P),
-                    ..
-                } => {
-                    paused = !paused;
-                    event!(
-                        tracing::Level::INFO,
-                        "{}",
-                        if paused { "Paused" } else { "Unpaused" }
-                    );
-                }
-                Event::KeyDown { keycode, .. } => {
                 }
                 _ => {}
             }
@@ -158,7 +141,7 @@ pub fn main() {
 
         tick_no += 1;
 
-        const PERIOD: u32 = 60 * 60;
+        const PERIOD: u32 = 60;
         let tick_mod = tick_no % PERIOD;
         if tick_mod % PERIOD == 0 {
             let average_fps = PERIOD as f32 / last_averaging_time.elapsed().as_secs_f32();
