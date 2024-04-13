@@ -1,0 +1,38 @@
+name: Github Pages
+on: [push]
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v2 # repo checkout
+
+      - uses: mymindstorm/setup-emsdk@v11 # setup emscripten toolchain
+        with:
+          version: 1.39.20
+
+      - uses: actions-rs/toolchain@v1 # get rust toolchain for wasm
+        with:
+          toolchain: stable
+          target: wasm32-unknown-emscripten
+          override: true
+
+      # TODO: Update to v2
+      - name: Rust Cache # cache the rust build artefacts
+        uses: Swatinem/rust-cache@v1
+
+      - name: Build # build
+        run: ./scripts/build-wasm.sh
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: './dist/'
+          retention-days: 7
+
+      - name: Deploy
+        uses: actions/deploy-pages@v2
