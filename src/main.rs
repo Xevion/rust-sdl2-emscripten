@@ -1,3 +1,4 @@
+use colors_transform::Color;
 use sdl2::event::{Event, WindowEvent};
 use sdl2::keyboard::Keycode;
 use std::time::{Duration, Instant};
@@ -48,6 +49,8 @@ pub fn main() {
     let mut sleep_time = Duration::ZERO;
     let mut paused = false;
     let mut shown = false;
+
+    let mut hue: u16 = 0;
 
     event!(
         tracing::Level::INFO,
@@ -108,10 +111,28 @@ pub fn main() {
             let mouse_x = mouse_state.x();
             let mouse_y = mouse_state.y();
             let square = sdl2::rect::Rect::new(mouse_x - 25, mouse_y - 25, 50, 50);
-            canvas.set_draw_color(sdl2::pixels::Color::RGB(255, 255, 255));
-            canvas.fill_rect(square).unwrap();
+            
+            // convert hue to rgb
+            let hue_rgb = colors_transform::Hsl::from(hue as f32, 100.0, 100.0).to_rgb();
+            let color = sdl2::pixels::Color::RGB(hue_rgb.get_red() as u8, hue_rgb.get_green() as u8, hue_rgb.get_blue() as u8);
 
+            event!(
+                tracing::Level::DEBUG,
+                "Drawing square at ({}, {}) with color {:?}",
+                mouse_x,
+                mouse_y,
+                color
+            );
+
+            canvas.set_draw_color(color);
+            canvas.fill_rect(square).unwrap();
+            
             canvas.present();
+
+            hue += 1;
+            if hue >= 360 {
+                hue = 0;
+            }
         }
 
         if start.elapsed() < loop_time {
