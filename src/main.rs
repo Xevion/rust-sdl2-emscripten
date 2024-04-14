@@ -9,22 +9,15 @@ use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
 
 static BLACK: Color = Color::RGB(0, 0, 0);
-static WHITE: Color = Color::RGB(255, 255, 255);
-
-#[cfg(target_family = "wasm")]
-pub mod emscripten;
 
 fn main() {
-    // #[cfg(target_os = "emscripten")]
-    // sdl2::hint::set("SDL_EMSCRIPTEN_ASYNCIFY","1");
-    
     let ctx = sdl2::init().unwrap();
     let video_ctx = ctx.video().unwrap();
 
     let window = match video_ctx
         .window("Hello, Rust / SDL2 / WASM!", 640, 480)
         .position_centered()
-        // .opengl()
+        .opengl()
         .build()
     {
         Ok(window) => window,
@@ -47,7 +40,9 @@ fn main() {
         .load_texture("./assets/fruit.png")
         .expect("could not load texture");
 
-    let mut main_loop = move || {
+    let mut frame = 0;
+
+    loop {
         let mut moved = false;
         for event in ctx.borrow_mut().event_pump().unwrap().poll_iter() {
             match event {
@@ -61,6 +56,12 @@ fn main() {
                 Event::KeyDown {
                     keycode: Some(key), ..
                 } => match key {
+                    Keycode::Space => {
+                        frame += 1;
+                        if frame > 7 {
+                            frame = 0;
+                        }
+                    }
                     Keycode::Left => {
                         point.x -= 32;
                         moved = true;
@@ -106,7 +107,7 @@ fn main() {
         canvas
             .copy_ex(
                 &fruit_atlas,
-                Rect::new(0, 0, 32, 32),
+                Rect::new(32 * frame, 0, 32, 32),
                 Rect::new(point.x, point.y, 32, 32),
                 0.0,
                 Some(Point::new(0, 0)),
@@ -116,7 +117,7 @@ fn main() {
             .expect("could not draw texture");
 
         canvas.present();
-    };
+    }
 
     // #[cfg(target_family = "wasm")]
     // {
@@ -133,8 +134,4 @@ fn main() {
     //         sleep(Duration::from_millis(10))
     //     }
     // }
-
-    loop {
-        main_loop();
-    }
 }
