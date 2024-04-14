@@ -118,6 +118,8 @@ pub fn main() {
             }
         }
 
+        event!(tracing::Level::DEBUG, "Loop took: {:?} (max {:?})", start.elapsed(), loop_time);
+
         if start.elapsed() < loop_time {
             let time = loop_time.saturating_sub(start.elapsed());
             if time != Duration::ZERO {
