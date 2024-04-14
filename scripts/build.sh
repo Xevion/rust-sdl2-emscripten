@@ -28,7 +28,7 @@ if [ "$skip_emsdk" = 'false' ]; then
     source ../emsdk/emsdk_env.sh
 fi
 
-export EMCC_CFLAGS="-s USE_SDL=2"
+# export EMCC_CFLAGS="-s USE_SDL=2"
 
 echo "Building WASM with Emscripten"
 build_type='debug'
