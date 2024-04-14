@@ -1,11 +1,8 @@
-use colors_transform::Color;
 use sdl2::event::{Event, WindowEvent};
-use sdl2::keyboard::Keycode;
 use std::time::{Duration, Instant};
 use tracing::event;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::layer::SubscriberExt;
-
 
 pub fn main() {
     let sdl_context = sdl2::init().unwrap();
@@ -21,7 +18,7 @@ pub fn main() {
     tracing::subscriber::set_global_default(subscriber).expect("Could not set global default");
 
     let window = video_subsystem
-        .window("Pac-Man", 500, 500)
+        .window("SDL2 Test", 800, 800)
         .position_centered()
         .build()
         .expect("Could not initialize window");
@@ -32,7 +29,7 @@ pub fn main() {
         .expect("Could not build canvas");
 
     canvas
-        .set_logical_size(500, 500)
+        .set_logical_size(800, 800)
         .expect("Could not set logical size");
 
     // let texture_creator = canvas.texture_creator();
@@ -42,21 +39,10 @@ pub fn main() {
         .expect("Could not get SDL EventPump");
 
     let loop_time = Duration::from_secs(1) / 60;
-    let mut tick_no = 0u32;
+    let mut shown = true;
 
     // The start of a period of time over which we average the frame time.
-    let mut last_averaging_time = Instant::now();
     let mut sleep_time = Duration::ZERO;
-    let mut paused = false;
-    let mut shown = false;
-
-    let mut hue: u16 = 0;
-
-    event!(
-        tracing::Level::INFO,
-        "Starting game loop ({:.3}ms)",
-        loop_time.as_secs_f32() * 1000.0
-    );
 
     let mut main_loop = || {
         let start = Instant::now();
@@ -66,26 +52,28 @@ pub fn main() {
             match event {
                 Event::Window { win_event, .. } => match win_event {
                     WindowEvent::Hidden => {
-                        event!(tracing::Level::DEBUG, "Window hidden");
+                        event!(tracing::Level::WARN, "Window hidden");
                         shown = false;
                     }
                     WindowEvent::Shown => {
-                        event!(tracing::Level::DEBUG, "Window shown");
+                        event!(tracing::Level::WARN, "Window shown");
                         shown = true;
                     }
                     _ => {}
                 },
                 // Handle quitting keys or window close
-                Event::Quit { .. }  => {
+                Event::Quit { .. } => {
                     event!(tracing::Level::INFO, "Exit requested. Exiting...");
                     return false;
                 }
-                _ => {}
+                _ => {
+                    event!(tracing::Level::WARN, "Unhandled event: {:?}", event);
+                }
             }
         }
 
-        // TODO: Proper pausing implementation that does not interfere with statistic gathering
-        if !paused {
+        if shown {
+            // Set background to black
             canvas.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
             canvas.clear();
 
@@ -94,72 +82,47 @@ pub fn main() {
             let mouse_x = mouse_state.x();
             let mouse_y = mouse_state.y();
             let square = sdl2::rect::Rect::new(mouse_x - 25, mouse_y - 25, 50, 50);
-            
-            // convert hue to rgb
-            let hue_rgb = colors_transform::Hsl::from(hue as f32, 100.0, 100.0).to_rgb();
-            let color = sdl2::pixels::Color::RGB(hue_rgb.get_red() as u8, hue_rgb.get_green() as u8, hue_rgb.get_blue() as u8);
 
-            event!(
-                tracing::Level::DEBUG,
-                "Drawing square at ({}, {}) with color {:?}",
-                mouse_x,
-                mouse_y,
-                color
-            );
-
-            canvas.set_draw_color(color);
+            canvas.set_draw_color(sdl2::pixels::Color::RGB(0, 255, 255));
             canvas.fill_rect(square).unwrap();
-            
+
+            canvas.set_draw_color(sdl2::pixels::Color::RGBA(255, 255, 255, 50));
+            canvas
+                .draw_line(
+                    sdl2::rect::Point::new(0, 0),
+                    sdl2::rect::Point::new(mouse_x, mouse_y),
+                )
+                .unwrap();
+
             canvas.present();
 
-            hue += 1;
-            if hue >= 360 {
-                hue = 0;
-            }
-        }
-
-        event!(tracing::Level::DEBUG, "Loop took: {:?} (max {:?})", start.elapsed(), loop_time);
-
-        if start.elapsed() < loop_time {
-            let time = loop_time.saturating_sub(start.elapsed());
-            if time != Duration::ZERO {
-                #[cfg(not(target_os = "emscripten"))]
-                {
-                    spin_sleep::sleep(time);
-                }
-                #[cfg(target_os = "emscripten")]
-                {
-                    std::thread::sleep(time);
-                }
-            }
-            sleep_time += time;
-        } else {
             event!(
                 tracing::Level::WARN,
-                "Game loop behind schedule by: {:?}",
-                start.elapsed() - loop_time
-            );
-        }
-
-        tick_no += 1;
-
-        const PERIOD: u32 = 60;
-        let tick_mod = tick_no % PERIOD;
-        if tick_mod % PERIOD == 0 {
-            let average_fps = PERIOD as f32 / last_averaging_time.elapsed().as_secs_f32();
-            let average_sleep = sleep_time / PERIOD;
-            let average_process = loop_time - average_sleep;
-
-            event!(
-                tracing::Level::DEBUG,
-                "Timing Averages [fps={}] [sleep={:?}] [process={:?}]",
-                average_fps,
-                average_sleep,
-                average_process
+                "Loop took: {:?} (max {:?})",
+                start.elapsed(),
+                loop_time
             );
 
-            sleep_time = Duration::ZERO;
-            last_averaging_time = Instant::now();
+            if start.elapsed() < loop_time {
+                let time = loop_time.saturating_sub(start.elapsed());
+                if time != Duration::ZERO {
+                    #[cfg(not(target_os = "emscripten"))]
+                    {
+                        spin_sleep::sleep(time);
+                    }
+                    #[cfg(target_os = "emscripten")]
+                    {
+                        std::thread::sleep(time);
+                    }
+                }
+                sleep_time += time;
+            } else {
+                event!(
+                    tracing::Level::WARN,
+                    "Game loop behind schedule by: {:?}",
+                    start.elapsed() - loop_time
+                );
+            }
         }
 
         true
