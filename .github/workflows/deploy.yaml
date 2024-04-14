@@ -11,22 +11,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2 # repo checkout
 
-      - uses: mymindstorm/setup-emsdk@v11 # setup emscripten toolchain
+      - uses: mymindstorm/setup-emsdk@v11
         with:
           version: 3.1.57
 
-      - uses: actions-rs/toolchain@v1 # get rust toolchain for wasm
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: wasm32-unknown-emscripten
           override: true
 
       # TODO: Update to v2
-      - name: Rust Cache # cache the rust build artefacts
+      - name: Rust Cache
         uses: Swatinem/rust-cache@v1
 
       - name: Build # build
-        run: ./scripts/build.sh -r
+        run: ./scripts/build.sh -er # release, skip emsdk
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v2
