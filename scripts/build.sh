@@ -7,14 +7,19 @@ skip_emsdk='false'
 clean='false'
 
 print_usage() {
-    printf "Usage: -r RELEASE -d DEBUG -s SERVE\n"
+    printf "Usage: -erdsc\n"
+    printf "  -e: Skip EMSDK setup (GitHub workflow only)\n"
+    printf "  -r: Build in release mode\n"
+    printf "  -d: Build in debug mode\n"
+    printf "  -s: Serve the WASM files once built\n"
+    printf "  -c: Clean the target/dist directory\n"
 }
 
 while getopts 'erdsc' flag; do
     case "${flag}" in
     e) skip_emsdk='true' ;;
     r) release='true' ;;
-    d) release='false' ;;
+    d) release='false' ;; # doesn't actually do anything, but last flag wins
     s) serve='true' ;;
     c) clean='true' ;;
     *)
