@@ -26,8 +26,9 @@ if [ "$skip_emsdk" = 'false' ]; then
     echo "Activating Emscripten"
     ./../emsdk/emsdk activate latest
     source ../emsdk/emsdk_env.sh
-    export EMCC_CFLAGS="-s USE_SDL=2"
 fi
+
+export EMCC_CFLAGS="-s USE_SDL=2"
 
 echo "Building WASM with Emscripten"
 build_type='debug'
