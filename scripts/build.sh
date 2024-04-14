@@ -4,23 +4,31 @@ set -eu
 release='false'
 serve='false'
 skip_emsdk='false'
+clean='false'
 
 print_usage() {
     printf "Usage: -r RELEASE -d DEBUG -s SERVE\n"
 }
 
-while getopts 'erds' flag; do
+while getopts 'erdsc' flag; do
     case "${flag}" in
     e) skip_emsdk='true' ;;
     r) release='true' ;;
     d) release='false' ;;
     s) serve='true' ;;
+    c) clean='true' ;;
     *)
         print_usage
         exit 1
         ;;
     esac
 done
+
+if [ "$clean" = 'true' ]; then
+    echo "Cleaning target directory"
+    cargo clean
+    rm -rf ./dist/
+fi
 
 if [ "$skip_emsdk" = 'false' ]; then
     echo "Activating Emscripten"
