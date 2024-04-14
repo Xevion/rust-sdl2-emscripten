@@ -45,6 +45,10 @@ output_folder="target/wasm32-unknown-emscripten/$build_type"
 cp assets/index.html dist
 cp $output_folder/pacman.wasm dist
 cp $output_folder/pacman.js dist
+# only if .data file exists
+if [ -f $output_folder/pacman.data ]; then
+    cp $output_folder/pacman.data dist
+fi
 
 if [ "$serve" = 'true' ]; then
     echo "Serving WASM with Emscripten"
