@@ -26,7 +26,7 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Build # build
-        run: ./scripts/build-wasm.sh
+        run: ./scripts/build.sh -r
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v2
