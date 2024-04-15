@@ -78,7 +78,7 @@ fn main() {
     let mut prev = now();
 
     let font_data = RWops::from_bytes(FONT_DATA).unwrap();
-    let font_size = 32;
+    let font_size = 12;
     let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
 
     let fruit_atlas = texture_creator
@@ -153,14 +153,6 @@ fn main() {
         canvas.set_draw_color(BLACK);
         canvas.clear();
 
-        // draw fps counter
-        let surface = font
-            .render(&format!("{:.2}", avg_fps))
-            .blended(Color::RGBA(255, 255, 255, 255))
-            .unwrap();
-        let texture = texture_creator.create_texture_from_surface(&surface).unwrap();
-        let _ = canvas.copy(&texture, None, Rect::new(0, 0, 100, 100));
-
         canvas
             .copy_ex(
                 &fruit_atlas,
@@ -171,7 +163,17 @@ fn main() {
                 false,
                 false,
             )
-            .expect("could not draw texture");
+            .unwrap();
+
+        // draw fps counter
+        let text = format!("{:.0}", avg_fps);
+        let surface = font
+            .render(&text)
+            .blended(Color::RGBA(255, 255, 255, 50))
+            .unwrap();
+        let texture = texture_creator.create_texture_from_surface(&surface).unwrap();
+        let _ = canvas.copy(&texture, None, Rect::new(640i32 - (25i32 * text.len() as i32), 0, 25 * text.len() as u32, 40));
+
 
         canvas.present();
 
