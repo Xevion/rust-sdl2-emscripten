@@ -1,14 +1,11 @@
-use std::cell::RefCell;
 use std::process;
-use std::rc::Rc;
+use std::time::Duration;
 
-use rand::seq::IteratorRandom;
 use sdl2::event::Event;
 use sdl2::image::LoadTexture;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
-use web_time::{Duration, Instant};
 
 static BLACK: Color = Color::RGB(0, 0, 0);
 
@@ -60,6 +57,8 @@ fn main() {
     let texture_creator = canvas.texture_creator();
     let mut point = Point::new(0, 0);
 
+    let mut prev = now();
+
     // let ctx = Rc::new(RefCell::new(ctx));
     // let canvas = Rc::new(RefCell::new(canvas));
     // let texture_creator = Rc::new(texture_creator);
@@ -70,8 +69,10 @@ fn main() {
 
     let target_fps = 60;
     let frame_time = Duration::from_secs_f32(1.0) / target_fps;
-    println!("Frame time: {:?}", frame_time);
     let mut frame = 0;
+
+    let mut n = 0;
+    let mut avg_fps = 0f64;
 
     loop {
         let start = now();
@@ -93,11 +94,6 @@ fn main() {
                         if frame > 7 {
                             frame = 0;
                         }
-
-                        // random number between 2 and 6
-                        let sleep_time = (15..=500).choose(&mut rand::thread_rng()).unwrap();
-                        println!("Sleeping for {} ms", sleep_time);
-                        sleep(sleep_time);
                     }
                     Keycode::Left => {
                         point.x -= 32;
@@ -158,15 +154,18 @@ fn main() {
         if elapsed < frame_time {
             let sleep_time = frame_time - elapsed;
             sleep(sleep_time.as_millis() as u32);
-            // println!("elapsed: {:?} sleep: {:?}ms ({:?})", elapsed, sleep_time, t2);
         } else {
             let excess = elapsed - frame_time;
             println!("! excess: {:?} ({:?})", excess, t2);
         }
 
-        let t3 = now();
-        let duration = Duration::from_secs_f64(t3 - start);
+        let duration = Duration::from_secs_f64(now() - prev);
         let fps = 1f64 / (duration.as_secs_f64());
-        println!("FPS: {}", fps);
+        prev = now();
+        
+        n += 1;
+        let a = 1f64 / n as f64;
+        let b = 1f64 - a;
+        avg_fps = a * fps + b * avg_fps;
     }
 }
