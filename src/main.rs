@@ -1,12 +1,16 @@
 use std::process;
 use std::time::Duration;
 
+use sdl2::rwops::RWops;
+use sdl2::ttf;
 use sdl2::event::Event;
 use sdl2::image::LoadTexture;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
 
+
+static FONT_DATA: &[u8] = include_bytes!("../assets/TerminalVector.ttf");
 static BLACK: Color = Color::RGB(0, 0, 0);
 
 #[cfg(target_os = "emscripten")]
@@ -35,6 +39,18 @@ fn sleep(ms: u32) {
     emscripten::emscripten::sleep(ms);
 }
 
+#[cfg(not(target_os = "emscripten"))]
+fn ttf_context() -> ttf::Sdl2TtfContext {
+    ttf::init().unwrap()
+}
+
+// Honestly, I don't know why this is necessary. I'm just copying from https://github.com/aelred/tetris/blob/0ad88153db1ca7962b42277504c0f7f9f3c675a9/tetris-sdl/src/main.rs#L88-L92
+#[cfg(target_os = "emscripten")]
+fn ttf_context() -> &'static ttf::Sdl2TtfContext {
+    // Deliberately leak so we get a static lifetime
+    Box::leak(Box::new(ttf::init().unwrap()))
+}
+
 fn main() {
     let ctx = sdl2::init().unwrap();
     let video_ctx = ctx.video().unwrap();
@@ -57,11 +73,13 @@ fn main() {
     let texture_creator = canvas.texture_creator();
     let mut point = Point::new(0, 0);
 
+    let ttf_ctx = ttf_context();
+
     let mut prev = now();
 
-    // let ctx = Rc::new(RefCell::new(ctx));
-    // let canvas = Rc::new(RefCell::new(canvas));
-    // let texture_creator = Rc::new(texture_creator);
+    let font_data = RWops::from_bytes(FONT_DATA).unwrap();
+    let font_size = 32;
+    let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
 
     let fruit_atlas = texture_creator
         .load_texture("./assets/fruit.png")
@@ -134,6 +152,14 @@ fn main() {
 
         canvas.set_draw_color(BLACK);
         canvas.clear();
+
+        // draw fps counter
+        let surface = font
+            .render(&format!("{:.2}", avg_fps))
+            .blended(Color::RGBA(255, 255, 255, 255))
+            .unwrap();
+        let texture = texture_creator.create_texture_from_surface(&surface).unwrap();
+        let _ = canvas.copy(&texture, None, Rect::new(0, 0, 100, 100));
 
         canvas
             .copy_ex(

@@ -37,11 +37,10 @@ fi
 
 if [ "$skip_emsdk" = 'false' ]; then
     echo "Activating Emscripten"
-    ./../emsdk/emsdk activate latest
+    # SDL2-TTF requires 3.1.43, fails to build on latest
+    ./../emsdk/emsdk activate 3.1.43
     source ../emsdk/emsdk_env.sh
 fi
-
-# export EMCC_CFLAGS="-s USE_SDL=2"
 
 echo "Building WASM with Emscripten"
 build_type='debug'
