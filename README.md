@@ -11,7 +11,7 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
 - [X] Reproducible SDL2 Emscripten Builds
   - This ensures that the project can iterate safely and be inspected in a safe environment, free from errors. Helps ensure errors are isolated to the machine or build script.
 - [ ] SDL2 Extensions
-  - [ ] Image
+  - [X] Image
   - [ ] Mixer
   - [ ] TTF
   - [ ] GFX
@@ -21,6 +21,20 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
   - The ability to use localStorage, fetch, or some browser-only API would be important.
 - [ ] Windows, MacOS, Linux Builds
   - Simple ability to provide multi-platform builds in addition to the WASM build.
+
+### Concept
+
+- A decent codebase without extras or warnings. Straightforward build process for Windows, Linux, and WASM.
+  - Note: Cross-compiling for Windows is a bit of a pain, but it's possible. That said, GitHub Actions can handle Windows builds natively.
+  - While SDL2 has annoying as fuck lifetimes, Emscripten callback loop imbibes even worse static lifetimes that are damn near impossible to satisfy.
+- A simple example of a game loop, input handling, and rendering.
+  - Pausing functionality, native-only quit.
+  - FPS counter toggle (TTF example).
+- Sprites with Atlas
+- Resizable Canvas
+- Javascript Interop
+  - LocalStorage
+  - Fetch
 
 ### Resources
 
@@ -35,3 +49,7 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
   - Has more advanced javascript config and examples to look at.
 - [deckarep/flappy-rust](https://github.com/deckarep/flappy-rust/)
   - Image + Mixer Usage, possibly GFX & TTF
+- [aelred/tetris](https://github.com/aelred/tetris)
+  - No idea how well it works overall, but it has a lot more advanced Emscripten bindings.
+  - Contains multiple sub-projects, including a web server. Uses SDL2 TTF & Mixer.
+  - See the [REST functions](https://github.com/aelred/tetris/blob/master/tetris/src/rest.rs#L99) for Emscripten.
