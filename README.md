@@ -8,19 +8,21 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
 
 ### Goals
 
-- [X] Reproducible SDL2 Emscripten Builds
+- [X] Automatic Builds
+  - [X] Web Assembly (Emscripten)
+  - [ ] Windows
+  - [ ] MacOS
+  - [ ] Linux
   - This ensures that the project can iterate safely and be inspected in a safe environment, free from errors. Helps ensure errors are isolated to the machine or build script.
 - [ ] SDL2 Extensions
   - [X] Image
   - [ ] Mixer
-  - [ ] TTF
+  - [X] TTF
   - [ ] GFX
   - All of these libraries are common and necessary for a lot of projects. Ensuring they work is important.
 - [ ] Example of External Javascript Interop
   - The basic ability to provide some kind of Javascript binding would be important for a decent web-based project or game.
   - The ability to use localStorage, fetch, or some browser-only API would be important.
-- [ ] Windows, MacOS, Linux Builds
-  - Simple ability to provide multi-platform builds in addition to the WASM build.
 
 ### Concept
 
@@ -50,6 +52,9 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
 - [deckarep/flappy-rust](https://github.com/deckarep/flappy-rust/)
   - Image + Mixer Usage, possibly GFX & TTF
 - [aelred/tetris](https://github.com/aelred/tetris)
-  - No idea how well it works overall, but it has a lot more advanced Emscripten bindings.
   - Contains multiple sub-projects, including a web server. Uses SDL2 TTF & Mixer.
+  - Most recent development (3 months ago).
+  - Custom font loading, packed inside the binary (WASM) instead of `.data` file, or external file.
+  - Advanced Emscripten bindings for Javascript (fetch, GET/POST)
+  - No Asyncify, uses `emscripten_set_main_loop` callback instead.
   - See the [REST functions](https://github.com/aelred/tetris/blob/master/tetris/src/rest.rs#L99) for Emscripten.
