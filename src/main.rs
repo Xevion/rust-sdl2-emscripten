@@ -77,9 +77,10 @@ fn main() {
 
     let mut prev = now();
 
-    let font_data = RWops::from_bytes(FONT_DATA).unwrap();
-    let font_size = 12;
-    let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
+    // let font_data = RWops::from_bytes(FONT_DATA).unwrap();
+    // let font_size = 12;
+    // let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
+    let font = ttf_ctx.load_font("./assets/TerminalVector.ttf", 12).unwrap();
 
     let fruit_atlas = texture_creator
         .load_texture("./assets/fruit.png")

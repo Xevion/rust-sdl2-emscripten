@@ -58,3 +58,7 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
   - Advanced Emscripten bindings for Javascript (fetch, GET/POST)
   - No Asyncify, uses `emscripten_set_main_loop` callback instead.
   - See the [REST functions](https://github.com/aelred/tetris/blob/master/tetris/src/rest.rs#L99) for Emscripten.
+- [coderedart/rust-sdl2-wasm](https://github.com/coderedart/rust-sdl2-wasm/tree/master)
+  - This is mostly interesting because it has an egui implementation; egui is very cool for demos, developer tooling, debug menus, and so on.
+  - The only thing I don't understand is where SDL2 is; there is almost no real code referencing SDL2 except a `SDL2Backend` provided by the `egui` crate. Weird.
+  - While devoid of anything particularly interesting for my own needs, it has a demo [here](https://coderedart.github.io/rust-sdl2-wasm/)
