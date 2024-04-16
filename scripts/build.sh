@@ -58,8 +58,9 @@ cp assets/index.html dist
 cp $output_folder/pacman.wasm dist
 cp $output_folder/pacman.js dist
 # only if .data file exists
-if [ -f $output_folder/deps/pacman.data ]; then
-    cp $output_folder/deps/pacman.data dist
+cp $output_folder/deps/pacman.data dist
+if [ -f $output_folder/pacman.wasm.map ]; then
+    cp $output_folder/pacman.wasm.map dist
 fi
 
 if [ "$serve" = 'true' ]; then
