@@ -1,16 +1,18 @@
 use std::process;
 use std::time::Duration;
 
-use sdl2::rwops::RWops;
-use sdl2::ttf;
 use sdl2::event::Event;
 use sdl2::image::LoadTexture;
 use sdl2::keyboard::Keycode;
+use sdl2::mixer::{self, LoaderRWops, Music};
 use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
-
+use sdl2::rwops::RWops;
+use sdl2::sys::AUDIO_S16LSB;
+use sdl2::ttf;
 
 static FONT_DATA: &[u8] = include_bytes!("../assets/TerminalVector.ttf");
+static MUSIC_DATA: &[u8] = include_bytes!("../assets/tetris.ogg");
 static BLACK: Color = Color::RGB(0, 0, 0);
 
 #[cfg(target_os = "emscripten")]
@@ -22,7 +24,7 @@ fn sleep(ms: u32) {
 }
 
 #[cfg(target_os = "emscripten")]
-fn now() -> f64  {
+fn now() -> f64 {
     emscripten::emscripten::now() / 1000f64
 }
 
@@ -75,12 +77,29 @@ fn main() {
 
     let ttf_ctx = ttf_context();
 
+    mixer::open_audio(
+        44_100,
+        sdl2::mixer::AUDIO_S16LSB,
+        sdl2::mixer::DEFAULT_CHANNELS,
+        1024,
+    )
+    .unwrap();
+
+    let mut volume = 3;
+    mixer::Music::set_volume(volume);
+
+    let music_data = RWops::from_bytes(MUSIC_DATA).unwrap();
+    let music = music_data.load_music().unwrap();
+    music.play(-1).unwrap();
+
     let mut prev = now();
 
-    // let font_data = RWops::from_bytes(FONT_DATA).unwrap();
-    // let font_size = 12;
-    // let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
-    let font = ttf_ctx.load_font("./assets/TerminalVector.ttf", 12).unwrap();
+    let font_data = RWops::from_bytes(FONT_DATA).unwrap();
+    let font_size = 12;
+    let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
+    let font = ttf_ctx
+        .load_font("./assets/TerminalVector.ttf", 12)
+        .unwrap();
 
     let fruit_atlas = texture_creator
         .load_texture("./assets/fruit.png")
@@ -123,12 +142,35 @@ fn main() {
                         moved = true;
                     }
                     Keycode::Up => {
-                        point.y -= 32;
-                        moved = true;
+                        if ctx
+                            .keyboard()
+                            .mod_state()
+                            .contains(sdl2::keyboard::Mod::LSHIFTMOD)
+                        {
+                            if volume < 128 {
+                                volume += 1;
+                                mixer::Music::set_volume(volume);
+                            }
+                        } else {
+                            point.y -= 32;
+                            moved = true;
+                        }
                     }
                     Keycode::Down => {
-                        point.y += 32;
-                        moved = true;
+                        // Shift means modify volume
+                        if ctx
+                            .keyboard()
+                            .mod_state()
+                            .contains(sdl2::keyboard::Mod::LSHIFTMOD)
+                        {
+                            if volume > 0 {
+                                volume -= 1;
+                                mixer::Music::set_volume(volume);
+                            }
+                        } else {
+                            point.y += 32;
+                            moved = true;
+                        }
                     }
                     _ => {}
                 },
@@ -172,9 +214,19 @@ fn main() {
             .render(&text)
             .blended(Color::RGBA(255, 255, 255, 50))
             .unwrap();
-        let texture = texture_creator.create_texture_from_surface(&surface).unwrap();
-        let _ = canvas.copy(&texture, None, Rect::new(640i32 - (25i32 * text.len() as i32), 0, 25 * text.len() as u32, 40));
-
+        let texture = texture_creator
+            .create_texture_from_surface(&surface)
+            .unwrap();
+        let _ = canvas.copy(
+            &texture,
+            None,
+            Rect::new(
+                640i32 - (25i32 * text.len() as i32),
+                0,
+                25 * text.len() as u32,
+                40,
+            ),
+        );
 
         canvas.present();
 
@@ -191,7 +243,7 @@ fn main() {
         let duration = Duration::from_secs_f64(now() - prev);
         let fps = 1f64 / (duration.as_secs_f64());
         prev = now();
-        
+
         n += 1;
         let a = 1f64 / n as f64;
         let b = 1f64 - a;

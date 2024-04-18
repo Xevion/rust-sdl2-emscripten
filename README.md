@@ -16,7 +16,7 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
   - This ensures that the project can iterate safely and be inspected in a safe environment, free from errors. Helps ensure errors are isolated to the machine or build script.
 - [ ] SDL2 Extensions
   - [X] Image
-  - [ ] Mixer
+  - [X] Mixer
   - [X] TTF
   - [ ] GFX
   - All of these libraries are common and necessary for a lot of projects. Ensuring they work is important.
