@@ -17,6 +17,8 @@ static BLACK: Color = Color::RGB(0, 0, 0);
 #[cfg(target_os = "emscripten")]
 mod emscripten;
 
+mod store;
+
 #[cfg(not(target_os = "emscripten"))]
 fn sleep(ms: u32) {
     std::thread::sleep(Duration::from_millis(ms as u64));
@@ -59,6 +61,8 @@ fn main() {
     let window = match video_ctx
         .window("Hello, Rust / SDL2 / WASM!", 640, 480)
         .position_centered()
+        .resizable()
+        .allow_highdpi()
         .opengl()
         .build()
     {
@@ -70,6 +74,8 @@ fn main() {
         Ok(canvas) => canvas,
         Err(err) => panic!("failed to create canvas: {}", err),
     };
+
+    // canvas.set_logical_size(1000, 1000);
 
     let texture_creator = canvas.texture_creator();
     let mut point = Point::new(0, 0);
@@ -84,8 +90,14 @@ fn main() {
     )
     .unwrap();
 
-    let mut volume = 1;
-    mixer::Music::set_volume(volume);
+    let storage = store::Store {};
+
+    let mut volume = storage.volume().map_or_else(|| {
+        println!("No volume stored, using default");
+        1
+    }, |v| v);
+    print!("Volume: {}", volume);
+    mixer::Music::set_volume(volume as i32);
 
     let music_data = RWops::from_bytes(MUSIC_DATA).unwrap();
     let music = mixer::LoaderRWops::load_music(&music_data).unwrap();
@@ -96,6 +108,7 @@ fn main() {
     // let font_data = RWops::from_bytes(FONT_DATA).unwrap();
     // let font_size = 12;
     // let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
+    
     let font = ttf_ctx
         .load_font("./assets/TerminalVector.ttf", 12)
         .unwrap();
@@ -116,6 +129,13 @@ fn main() {
         let mut moved = false;
         for event in ctx.event_pump().unwrap().poll_iter() {
             match event {
+                Event::Window { win_event, .. } => match win_event {
+                    sdl2::event::WindowEvent::Resized(w, h) => {
+                        println!("Resized to {}x{}", w, h);
+                        canvas.window_mut().set_size(w as u32, h as u32).unwrap();
+                    }
+                    _ => {}
+                },
                 Event::Quit { .. }
                 | Event::KeyDown {
                     keycode: Some(Keycode::Escape),
@@ -148,7 +168,8 @@ fn main() {
                         {
                             if volume < 128 {
                                 volume += 1;
-                                mixer::Music::set_volume(volume);
+                                mixer::Music::set_volume(volume as i32);
+                                storage.set_volume(volume);
                             }
                         } else {
                             point.y -= 32;
@@ -164,7 +185,8 @@ fn main() {
                         {
                             if volume > 0 {
                                 volume -= 1;
-                                mixer::Music::set_volume(volume);
+                                mixer::Music::set_volume(volume as i32);
+                                storage.set_volume(volume);
                             }
                         } else {
                             point.y += 32;

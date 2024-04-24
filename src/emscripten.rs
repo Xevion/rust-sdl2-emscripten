@@ -6,7 +6,6 @@ pub mod emscripten {
     extern "C" {
         pub fn emscripten_get_now() -> f64;
         pub fn emscripten_sleep(ms: c_uint);
-        pub fn emscripten_run_script(script: *const u8);
         pub fn emscripten_get_element_css_size(
             target: *const u8,
             width: *mut f64,
@@ -22,12 +21,6 @@ pub mod emscripten {
     pub fn sleep(ms: u32) {
         unsafe {
             emscripten_sleep(ms);
-        }
-    }
-
-    pub fn exec(script: &str) {
-        unsafe {
-            emscripten_run_script(script.as_ptr());
         }
     }
 
