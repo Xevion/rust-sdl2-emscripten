@@ -23,11 +23,9 @@ jobs:
           version: 3.1.43
 
       - name: Setup Rust (WASM32 Emscripten)
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
           target: wasm32-unknown-emscripten
-          override: true
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -62,11 +60,9 @@ jobs:
         run: sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-gfx-dev
 
       - name: Setup Rust Toolchain (Linux)
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
           target: x86_64-unknown-linux-gnu
-          override: true
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -135,11 +131,9 @@ jobs:
           cp C:\vcpkg\packages\sdl2-gfx_x64-windows-release\lib\SDL2_gfx.lib ./
       
       - name: Setup Rust (Windows)
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          target: x86_64-pc-windows-gnu
-          override: true
+          targets: x86_64-pc-windows-gnu
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
