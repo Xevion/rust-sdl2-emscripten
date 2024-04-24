@@ -52,13 +52,6 @@ jobs:
           cp C:\vcpkg\packages\sdl2-gfx_x64-windows-release\bin\SDL2_gfx.dll ./
           cp C:\vcpkg\packages\sdl2-gfx_x64-windows-release\lib\SDL2_gfx.lib ./
       
-      - name: Debug - VCPKG
-        uses: actions/upload-artifact@v4
-        with:
-          path: C:\vcpkg\
-          retention-days: 7
-          if-no-files-found: error
-          
       - name: Setup Rust (Windows)
         uses: actions-rs/toolchain@v1
         with:
