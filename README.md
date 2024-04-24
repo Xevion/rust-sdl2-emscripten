@@ -12,11 +12,11 @@ A [demo](https://xevion.github.io/rust-sdl2-emscripten/) project to explore Rust
 - [ ] Emscrimpten Looping Method
   - [X] Asyncify
   - [ ] `emscripten_set_main_loop`
-- [ ] Automatic Builds
+- [X] Automatic Builds
   - [X] [Web Assembly][workflow-file] (Emscripten)
   - [X] [Windows][workflow-file]
   - [X] [Linux][workflow-file]
-  - [ ] MacOS
+  - [X] MacOS
 - [X] SDL2 Extensions
   - [X] Image
   - [X] Mixer
