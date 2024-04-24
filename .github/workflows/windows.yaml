@@ -22,11 +22,11 @@ jobs:
 
       - name: Download SDL2 Libraries
         run: |
-          curl "https://github.com/libsdl-org/SDL/releases/download/release-$SDL2/SDL2-$SDL2-win32-x64.zip" -o "sdl2.zip"
-          curl "https://github.com/libsdl-org/SDL_ttf/releases/download/release-$SDL2_TTF/SDL2_ttf-$SDL2_TTF-win32-x64.zip" -o "sdl2_ttf.zip"
-          curl "https://github.com/libsdl-org/SDL_image/releases/download/release-$SDL2_IMAGE/SDL2_image-$SDL2_IMAGE-win32-x64.zip" -o "sdl2_image.zip"
-          curl "https://github.com/libsdl-org/SDL_mixer/releases/download/release-$SDL2_MIXER/SDL2_mixer-$SDL2_MIXERwin32-x64.zip" -o "sdl2_mixer.zip"
-          curl "https://sourceforge.net/projects/sdl2gfx/files/SDL2_gfx-$SDL2_.tar.gz/download" -o "sdl2_gfx.tar.gz"
+          curl -L "https://github.com/libsdl-org/SDL/releases/download/release-${{ env.SDL2 }}/SDL2-${{ env.SDL2 }}-win32-x64.zip" -o "sdl2.zip"
+          curl -L "https://github.com/libsdl-org/SDL_ttf/releases/download/release-${{ env.SDL2_TTF }}/SDL2_ttf-${{ env.SDL2_TTF }}-win32-x64.zip" -o "sdl2_ttf.zip"
+          curl -L "https://github.com/libsdl-org/SDL_image/releases/download/release-${{ env.SDL2_IMAGE }}/SDL2_image-${{ env.SDL2_IMAGE }}-win32-x64.zip" -o "sdl2_image.zip"
+          curl -L "https://github.com/libsdl-org/SDL_mixer/releases/download/release-${{ env.SDL2_MIXER }}/SDL2_mixer-${{ env.SDL2_MIXERwin32 }}-x64.zip" -o "sdl2_mixer.zip"
+          curl -L "https://sourceforge.net/projects/sdl2gfx/files/SDL2_gfx-${{ env.SDL2_GFX }}.tar.gz/download" -o "sdl2_gfx.tar.gz"
       
       - name: Debug Artifact
         uses: actions/upload-artifact@v4
