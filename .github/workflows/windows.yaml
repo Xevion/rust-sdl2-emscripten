@@ -49,11 +49,16 @@ jobs:
       - name: Install SDL2_gfx
         run: |
           C:\vcpkg\vcpkg.exe install sdl2-gfx --triplet x64-windows
-          ls C:\vcpkg\packages\sdl2-gfx_x64-windows\share\sdl2-gfx\
-          ls C:\vcpkg\installed\sdl2-gfx_x64-windows\share\sdl2-gfx\
-          cp C:\vcpkg\packages\sdl2-gfx_x64-windows\share\sdl2-gfx\SDL2_gfx.lib ./
-          cp C:\vcpkg\packages\sdl2-gfx_x64-windows\share\sdl2-gfx\SDL2_gfx.dll ./
-
+        #cp C:\vcpkg\packages\sdl2-gfx_x64-windows\share\sdl2-gfx\SDL2_gfx.lib ./
+        #cp C:\vcpkg\packages\sdl2-gfx_x64-windows\share\sdl2-gfx\SDL2_gfx.dll ./
+      
+      - name: Debug - VCPKG
+        uses: actions/upload-artifact@v4
+        with:
+          path: C:\vcpkg\
+          retention-days: 7
+          if-no-files-found: error
+          
       - name: Setup Rust (Windows)
         uses: actions-rs/toolchain@v1
         with:
