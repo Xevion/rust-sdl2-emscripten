@@ -13,9 +13,9 @@ A [demo](https://xevion.github.io/rust-sdl2-emscripten/) project to explore Rust
   - [X] Asyncify
   - [ ] `emscripten_set_main_loop`
 - [ ] Automatic Builds
-  - [X] [Web Assembly](./.github/workflows/wasm.yaml) (Emscripten)
-  - [ ] [Windows](./.github/workflows/windows.yaml)
-  - [X] [Linux](./.github/workflows/linux.yaml)
+  - [X] [Web Assembly][workflow-file] (Emscripten)
+  - [X] [Windows][workflow-file]
+  - [X] [Linux][workflow-file]
   - [ ] MacOS
 - [X] SDL2 Extensions
   - [X] Image
@@ -59,6 +59,11 @@ My worry with a bigger project is that the complexity of the system will grow ex
   - [`SDL2_IMAGE_FORMATS`][emscripten-docs-sdl2-image-formats] is required for specifying the image formats to load with SDL2's Image.
   - [`SDL2_MIXER_FORMATS`][emscripten-docs-sdl2-mixer-formats] is required for specifying the audio formats to load with SDL2's Mixer.
   - Please check [`config.toml`](./.cargo/config.toml) for an example of how to specify it, as well as the format of each flag; some take a list of values or a version number, or just `1`.
+- SDL2, as well as all the extensions require `.lib` files for compilation, and `.dll` files for execution on Windows.
+  - Check the [workflow file][workflow-file] for details on what this means specifically.
+    - While all extensions could be compiled using `vcpkg`, downloading the `devel` libraries seems to be fastest. Although, they might be debug artifacts...
+  - Please note that `SDL2_gfx` is different in that it is not managed by the SDL working group, and thus does not provide official releases.
+    - Additionally, there are separate SDL (v1) and SDL2 versions of SDL_gfx, and of course for added confusion, SDL_gfx (for SDL v1), is currently on v2.x.x
 
 ### Resources
 
@@ -91,6 +96,7 @@ A list of various resources I relied on and studied while building this project.
   - The only thing I don't understand is where SDL2 is; there is almost no real code referencing SDL2 except a `SDL2Backend` provided by the `egui` crate. Weird.
   - While devoid of anything particularly interesting for my own needs, it has a demo [here](https://coderedart.github.io/rust-sdl2-wasm/)
 
+[workflow-file]: ./.github/workflows/build.yaml
 [emscripten-asyncify]: https://emscripten.org/docs/porting/asyncify.html
 [emscripten-docs-asyncify]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#asyncify
 [emscripten-docs-allow-memory-growth]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#allow-memory-growth
