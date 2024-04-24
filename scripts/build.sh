@@ -51,10 +51,17 @@ else
     cargo build --target=wasm32-unknown-emscripten
 fi
 
+echo "Generating CSS"
+pnpx postcss-cli ./assets/styles.scss -o ./assets/build.css
+
 echo "Copying WASM files"
 mkdir -p dist
 output_folder="target/wasm32-unknown-emscripten/$build_type"
 cp assets/index.html dist
+
+cp assets/*.woff* dist
+cp assets/build.css dist
+cp assets/favicon.ico dist
 cp $output_folder/pacman.wasm dist
 cp $output_folder/pacman.js dist
 # only if .data file exists

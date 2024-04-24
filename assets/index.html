@@ -1,27 +1,52 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-</head>
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #000;
-    }
-    canvas {
-        display: block;
-        margin: 0 auto;
-        background: #000;
-    }
-</style>
-<body>
-    <canvas id="canvas"></canvas>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/build.css" />
+  </head>
+  <body class="m-0 p-0 bg-black text-white">
+    <div class="max-w-screen-md mx-auto mt-10">
+      <h1 class="text-xl lowercase my-1">
+        <span class="px-1 rounded font-mono bg-zinc-900 border border-zinc-700"
+          >rust-sdl2-emscripten</span
+        >
+      </h1>
+      <p class="ml-5">
+        This is a demo of a simple program written in Rust using the SDL2
+        library and compiled to WebAssembly using Emscripten. The game loop is
+        implemented directly in Rust and uses Emscripten's Asyncify feature, as
+        well as hooks to
+      </p>
+      <canvas id="canvas" class="rounded border border-white/25 my-4"></canvas>
+      <div class="mt-2 mx-3">
+        <div class="mt-2 mx-3">
+          <h2 class="text-xl font-mono lowercase">Notes</h2>
+          <p class="ml-5">
+            This demo uses all four SDL2 extensions; Image, Mixer, TTF, and GFX.
+          </p>
+          <h2 class="text-xl font-mono mt-1 lowercase">Controls</h2>
+          <ul class="ml-5 *:my-1">
+            <li>
+              <span class="code">&larr; &uarr; &rarr; &darr;</span>
+              Move Sprite
+            </li>
+            <li>
+              <span class="code">space</span>
+              Change Sprite
+            </li>
+            <li>
+              <span class="code">shift + &uarr;&darr;</span>
+              Change Volume
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <script type="text/javascript">
-        var Module = {
-            'canvas': document.getElementById('canvas'),
-        };
+      var Module = {
+        canvas: document.getElementById("canvas"),
+      };
     </script>
     <script type="text/javascript" src="pacman.js"></script>
-</body>
+  </body>
 </html>

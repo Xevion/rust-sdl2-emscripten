@@ -1,15 +1,20 @@
-name: Github Pages
+name: WebAssembly (GitHub Pages)
+
 on: [push]
+
 permissions:
   contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     permissions:
       pages: write
       id-token: write
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: mymindstorm/setup-emsdk@v11
         with:
@@ -23,6 +28,12 @@ jobs:
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
+
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: true
 
       - name: Build # build
         run: ./scripts/build.sh -er # release, skip emsdk
