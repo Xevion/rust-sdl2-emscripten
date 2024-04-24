@@ -23,19 +23,28 @@ jobs:
       - name: Download SDL2 Libraries
         run: |
           curl -L "https://github.com/libsdl-org/SDL/releases/download/release-${{ env.SDL2 }}/SDL2-devel-${{ env.SDL2 }}-VC.zip" -o "sdl2_devel.zip"
-          curl -L "https://github.com/libsdl-org/SDL_ttf/releases/download/release-${{ env.SDL2_TTF }}/SDL2_ttf-${{ env.SDL2_TTF }}-win32-x64.zip" -o "sdl2_ttf.zip"
-          curl -L "https://github.com/libsdl-org/SDL_image/releases/download/release-${{ env.SDL2_IMAGE }}/SDL2_image-${{ env.SDL2_IMAGE }}-win32-x64.zip" -o "sdl2_image.zip"
-          curl -L "https://github.com/libsdl-org/SDL_mixer/releases/download/release-${{ env.SDL2_MIXER }}/SDL2_mixer-${{ env.SDL2_MIXER }}-win32-x64.zip" -o "sdl2_mixer.zip"
-          curl -L "https://sourceforge.net/projects/sdl2gfx/files/SDL2_gfx-${{ env.SDL2_GFX }}.tar.gz/download" -o "sdl2_gfx.tar.gz"
+          curl -L "https://github.com/libsdl-org/SDL_mixer/releases/download/release-${{ env.SDL2_MIXER }}/SDL2_mixer-devel-${{ env.SDL2_MIXER }}-VC.zip" -o "sdl2_mixer_devel.zip"
+          curl -L "https://github.com/libsdl-org/SDL_ttf/releases/download/release-${{ env.SDL2_TTF }}/SDL2_ttf-devel-${{ env.SDL2_TTF }}-VC.zip" -o "sdl2_ttf_devel.zip"
+          curl -L "https://github.com/libsdl-org/SDL_image/releases/download/release-${{ env.SDL2_IMAGE }}/SDL2_image-devel-${{ env.SDL2_IMAGE }}-VC.zip" -o "sdl2_image_devel.zip"
+        # curl -L "https://sourceforge.net/projects/sdl2gfx/files/SDL2_gfx-${{ env.SDL2_GFX }}.tar.gz/download" -o "sdl2_gfx.tar.gz"
       
       - name: Extract SDL2 DLLs
         run: |
           7z x ./sdl2_devel.zip -o"./tmp/"
           mv ./tmp/SDL2-${{ env.SDL2 }}/lib/x64/SDL2.dll ./
           mv ./tmp/SDL2-${{ env.SDL2 }}/lib/x64/SDL2.lib ./
-          7z x ./sdl2_image.zip SDL2_image.dll
-          7z x ./sdl2_ttf.zip SDL2_ttf.dll
-          7z x ./sdl2_mixer.zip SDL2_mixer.dll
+
+          7z x ./sdl2_mixer_devel.zip -o"./tmp/"
+          mv ./tmp/SDL2_mixer-${{ env.SDL2_MIXER }}/lib/x64/SDL2_mixer.dll ./
+          mv ./tmp/SDL2_mixer-${{ env.SDL2_MIXER }}/lib/x64/SDL2_mixer.lib ./
+
+          7z x ./sdl2_ttf_devel.zip -o"./tmp/"
+          mv ./tmp/SDL2_ttf-${{ env.SDL2_TTF }}/lib/x64/SDL2_ttf.dll ./
+          mv ./tmp/SDL2_ttf-${{ env.SDL2_TTF }}/lib/x64/SDL2_ttf.lib ./
+
+          7z x ./sdl2_image_devel.zip -o"./tmp/"
+          mv ./tmp/SDL2_image-${{ env.SDL2_IMAGE }}/lib/x64/SDL2_image.dll ./
+          mv ./tmp/SDL2_image-${{ env.SDL2_IMAGE }}/lib/x64/SDL2_image.lib ./
 
       - name: Setup Rust (Windows)
         uses: actions-rs/toolchain@v1
