@@ -87,6 +87,8 @@ jobs:
   
   macos:
     runs-on: macos-13
+    env:
+      TARGET: x86_64-apple-darwin
 
     steps:
       - name: Checkout 
@@ -98,7 +100,7 @@ jobs:
       - name: Setup Rust Toolchain (MacOS)
         uses: dtolnay/rust-toolchain@stable
         with:
-          target: x86_64-apple-darwin
+          target: ${{ env.TARGET }}
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -110,14 +112,18 @@ jobs:
         run: |
           mkdir /tmp/example/
           cp ./target/release/spiritus /tmp/example/
-          chmod a+x /tmp/example/spiritus
           mkdir /tmp/example/assets
           cp ./assets/TerminalVector.ttf ./assets/tetris.ogg ./assets/fruit.png /tmp/example/assets
+      
+      - name: Acquire Package Version
+        run: |
+          cargo install toml-cli
+          echo "PACKAGE_VERSION=$(toml get ./Cargo.toml package.version --raw)" >> $GITHUB_ENV
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MacOS_x64
+          name: "spiritus-${{ env.PACKAGE_VERSION }}-${{ env.TARGET }}"
           path: /tmp/example/
           retention-days: 7
           if-no-files-found: error
