@@ -59,7 +59,7 @@ fn main() {
     let video_ctx = ctx.video().unwrap();
 
     let window = match video_ctx
-        .window("Hello, Rust / SDL2 / WASM!", 640, 480)
+        .window("rust-sdl2-emscripten", 640, 480)
         .position_centered()
         .resizable()
         .allow_highdpi()
