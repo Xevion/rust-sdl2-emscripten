@@ -26,7 +26,6 @@ jobs:
           curl -L "https://github.com/libsdl-org/SDL_mixer/releases/download/release-${{ env.SDL2_MIXER }}/SDL2_mixer-devel-${{ env.SDL2_MIXER }}-VC.zip" -o "sdl2_mixer_devel.zip"
           curl -L "https://github.com/libsdl-org/SDL_ttf/releases/download/release-${{ env.SDL2_TTF }}/SDL2_ttf-devel-${{ env.SDL2_TTF }}-VC.zip" -o "sdl2_ttf_devel.zip"
           curl -L "https://github.com/libsdl-org/SDL_image/releases/download/release-${{ env.SDL2_IMAGE }}/SDL2_image-devel-${{ env.SDL2_IMAGE }}-VC.zip" -o "sdl2_image_devel.zip"
-        # curl -L "https://sourceforge.net/projects/sdl2gfx/files/SDL2_gfx-${{ env.SDL2_GFX }}.tar.gz/download" -o "sdl2_gfx.tar.gz"
       
       - name: Extract SDL2 DLLs
         run: |
