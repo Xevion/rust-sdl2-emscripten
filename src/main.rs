@@ -71,9 +71,10 @@ fn main() {
     
     let ctx = sdl2::init().unwrap();
     let video_ctx = ctx.video().unwrap();
+    let mut window_size = Point::new(640, 480);
     
     let window = match video_ctx
-    .window("rust-sdl2-emscripten", 640, 480)
+    .window("rust-sdl2-emscripten", window_size.x as u32, window_size.y as u32)
     .position_centered()
     .resizable()
     .allow_highdpi()
@@ -89,8 +90,6 @@ fn main() {
         Ok(canvas) => canvas,
         Err(err) => panic!("failed to create canvas: {}", err),
     };
-
-    // canvas.set_logical_size(1000, 1000);
 
     let texture_creator = canvas.texture_creator();
     let mut point = Point::new(0, 0);
@@ -114,7 +113,7 @@ fn main() {
         },
         |v| v,
     );
-    print!("Volume: {}", volume);
+    println!("Volume: {}", volume);
     mixer::Music::set_volume(volume as i32);
 
     let music_data = RWops::from_bytes(MUSIC_DATA).unwrap();
@@ -157,6 +156,8 @@ fn main() {
                 Event::Window { win_event, .. } => match win_event {
                     sdl2::event::WindowEvent::Resized(w, h) => {
                         println!("Resized to {}x{}", w, h);
+                        window_size.x = w;
+                        window_size.y = h;
                         canvas.window_mut().set_size(w as u32, h as u32).unwrap();
                     }
                     _ => {}
@@ -229,7 +230,7 @@ fn main() {
             let canvas_size = canvas.window().size();
             if point.x < 0 {
                 point.x = canvas_size.0 as i32 - 32;
-            } else if point.x >= 640 {
+            } else if point.x >= canvas_size.0 as i32 {
                 point.x = 0;
             }
             if point.y < 0 {
@@ -244,7 +245,11 @@ fn main() {
 
         let focused = ctx.mouse().focused_window_id().is_some();
         if focused != previous_focus {
-            println!("Focus: {:?}", focused);
+            if focused {
+                println!("Focus gained");
+            } else {
+                println!("Focus lost");
+            }
             previous_focus = focused;
         }
 
@@ -286,7 +291,7 @@ fn main() {
             &texture,
             None,
             Rect::new(
-                640i32 - (25i32 * text.len() as i32),
+                window_size.x - (25i32 * text.len() as i32),
                 0,
                 25 * text.len() as u32,
                 40,
