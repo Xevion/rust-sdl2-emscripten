@@ -40,7 +40,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "Linux Build"
+          name: linux
           path: /tmp/example/
           retention-days: 7
           if-no-files-found: error
