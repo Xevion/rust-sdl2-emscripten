@@ -35,7 +35,7 @@ jobs:
           cp ./target/release/pacman /tmp/example/
           chmod a+x /tmp/example/pacman
           mkdir /tmp/example/assets
-          cp ./assets/TerminalVector.ttf ./assets/tetris.ogg /tmp/example/assets
+          cp ./assets/TerminalVector.ttf ./assets/tetris.ogg ./assets/fruit.png /tmp/example/assets
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
