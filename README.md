@@ -3,6 +3,7 @@
 A [demo](https://xevion.github.io/rust-sdl2-emscripten/) project to explore Rust + SDL2 + Emscripten.
 
 - Cross-platform build scripts with GitHub Actions for Windows, Linux, and Web Assembly.
+  - Includes special packaging for Windows for DLLs
 - All SDL2 extensions enabled (Image, Mixer, TTF, GFX) and used in the project.
 - Emscripten: Asyncify for the game loop, Javascript Interop, `extern` functions & hooks.
 
@@ -12,9 +13,9 @@ A [demo](https://xevion.github.io/rust-sdl2-emscripten/) project to explore Rust
   - [X] Asyncify
   - [ ] `emscripten_set_main_loop`
 - [ ] Automatic Builds
-  - [X] Web Assembly (Emscripten)
-  - [ ] Windows
-  - [ ] Linux
+  - [X] [Web Assembly](./.github/workflows/wasm.yaml) (Emscripten)
+  - [ ] [Windows](./.github/workflows/windows.yaml)
+  - [X] [Linux](./.github/workflows/linux.yaml)
   - [ ] MacOS
 - [X] SDL2 Extensions
   - [X] Image
