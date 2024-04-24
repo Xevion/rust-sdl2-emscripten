@@ -14,12 +14,11 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
   - [ ] MacOS
   - [ ] Linux
   - This ensures that the project can iterate safely and be inspected in a safe environment, free from errors. Helps ensure errors are isolated to the machine or build script.
-- [ ] SDL2 Extensions
+- [X] SDL2 Extensions
   - [X] Image
   - [X] Mixer
   - [X] TTF
-  - [ ] GFX
-  - All of these libraries are common and necessary for a lot of projects. Ensuring they work is important.
+  - [X] GFX
 - [X] Example of External Javascript Interop
   - The basic ability to provide some kind of Javascript binding would be important for a decent web-based project or game.
   - The ability to use localStorage, fetch, or some browser-only API would be important.

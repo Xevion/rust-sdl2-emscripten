@@ -2,6 +2,7 @@ use std::process;
 use std::time::Duration;
 
 use sdl2::event::Event;
+use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::image::LoadTexture;
 use sdl2::keyboard::Keycode;
 use sdl2::mixer;
@@ -92,10 +93,13 @@ fn main() {
 
     let storage = store::Store {};
 
-    let mut volume = storage.volume().map_or_else(|| {
-        println!("No volume stored, using default");
-        1
-    }, |v| v);
+    let mut volume = storage.volume().map_or_else(
+        || {
+            println!("No volume stored, using default");
+            1
+        },
+        |v| v,
+    );
     print!("Volume: {}", volume);
     mixer::Music::set_volume(volume as i32);
 
@@ -108,7 +112,7 @@ fn main() {
     // let font_data = RWops::from_bytes(FONT_DATA).unwrap();
     // let font_size = 12;
     // let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
-    
+
     let font = ttf_ctx
         .load_font("./assets/TerminalVector.ttf", 12)
         .unwrap();
@@ -124,11 +128,18 @@ fn main() {
     let mut n = 0;
     let mut avg_fps = 0f64;
 
+    let mut mouse = Point::new(0, 0);
+    let mut previous_focus = false;
+
     loop {
         let start = now();
         let mut moved = false;
+
         for event in ctx.event_pump().unwrap().poll_iter() {
             match event {
+                Event::MouseMotion { x, y, .. } => {
+                    mouse = Point::new(x, y);
+                }
                 Event::Window { win_event, .. } => match win_event {
                     sdl2::event::WindowEvent::Resized(w, h) => {
                         println!("Resized to {}x{}", w, h);
@@ -216,6 +227,25 @@ fn main() {
 
         canvas.set_draw_color(BLACK);
         canvas.clear();
+
+        let focused = ctx.mouse().focused_window_id().is_some();
+        if focused != previous_focus {
+            println!("Focus: {:?}", focused);
+            previous_focus = focused;
+        }
+
+        // Draw a 32x32 square at the mouse position
+        if focused {
+            let mouse_x = (mouse.x / 32 * 32) as i16;
+            let mouse_y = (mouse.y / 32 * 32) as i16;
+            let color = Color::RGB(255, 255, 255);
+
+            let _ = canvas.line(mouse_x, mouse_y, mouse_x + 32, mouse_y, color);
+            let _ = canvas.line(mouse_x + 32, mouse_y, mouse_x + 32, mouse_y + 32, color);
+            let _ = canvas.line(mouse_x + 32, mouse_y + 32, mouse_x, mouse_y + 32, color);
+            let _ = canvas.line(mouse_x, mouse_y + 32, mouse_x, mouse_y, color);
+        }
+        // canvas.line(top_left.x as i16, top_left.y as i16, top_left.x as i16 + 32, top_left.y as i16 + 32, color);
 
         canvas
             .copy_ex(
