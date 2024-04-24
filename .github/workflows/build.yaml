@@ -115,9 +115,12 @@ jobs:
           mkdir /tmp/example/assets
           cp ./assets/TerminalVector.ttf ./assets/fruit.png /tmp/example/assets
       
+      - name: Install Cargo Binstall
+        uses: cargo-bins/cargo-binstall@main
+
       - name: Acquire Package Version
         run: |
-          cargo install toml-cli
+          cargo binstall toml-cli -y
           echo "PACKAGE_VERSION=$(toml get ./Cargo.toml package.version --raw)" >> $GITHUB_ENV
 
       - name: Upload Artifact
