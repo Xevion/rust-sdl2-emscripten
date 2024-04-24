@@ -122,23 +122,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
-name = "pacman"
-version = "0.1.0"
-dependencies = [
- "atty",
- "colors-transform",
- "lazy_static",
- "libc",
- "rand",
- "sdl2",
- "spin_sleep",
- "tracing",
- "tracing-error",
- "tracing-subscriber",
- "winapi",
-]
-
-[[package]]
 name = "pin-project-lite"
 version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -288,6 +271,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cafa7900db085f4354dbc7025e25d7a839a14360ea13b5fc4fd717f2d3b23134"
 dependencies = [
  "once_cell",
+ "winapi",
+]
+
+[[package]]
+name = "spiritus"
+version = "0.1.0"
+dependencies = [
+ "atty",
+ "colors-transform",
+ "lazy_static",
+ "libc",
+ "rand",
+ "sdl2",
+ "spin_sleep",
+ "tracing",
+ "tracing-error",
+ "tracing-subscriber",
  "winapi",
 ]
 

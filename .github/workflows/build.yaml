@@ -77,8 +77,8 @@ jobs:
       - name: Assemble Archive
         run: |
           mkdir /tmp/example/
-          cp ./target/release/pacman /tmp/example/
-          chmod a+x /tmp/example/pacman
+          cp ./target/release/spiritus /tmp/example/
+          chmod a+x /tmp/example/spiritus
           mkdir /tmp/example/assets
           cp ./assets/TerminalVector.ttf ./assets/tetris.ogg ./assets/fruit.png /tmp/example/assets
 
@@ -150,7 +150,7 @@ jobs:
       - name: Prepare Archive
         run: |
           New-Item -Type Directory ./release/
-          Move-Item -Path ./target/release/pacman.exe -Destination ./release/
+          Move-Item -Path ./target/release/spiritus.exe -Destination ./release/
           Move-Item -Path ./SDL2.dll, ./SDL2_image.dll, ./SDL2_ttf.dll, ./SDL2_mixer.dll, ./SDL2_gfx.dll -Destination ./release/
           New-Item -Type Directory ./release/assets/
           Move-Item -Path ./assets/TerminalVector.ttf, ./assets/tetris.ogg, ./assets/fruit.png -Destination ./release/assets/

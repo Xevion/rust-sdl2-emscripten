@@ -62,12 +62,12 @@ cp assets/index.html dist
 cp assets/*.woff* dist
 cp assets/build.css dist
 cp assets/favicon.ico dist
-cp $output_folder/pacman.wasm dist
-cp $output_folder/pacman.js dist
+cp $output_folder/spiritus.wasm dist
+cp $output_folder/spiritus.js dist
 # only if .data file exists
-cp $output_folder/deps/pacman.data dist
-if [ -f $output_folder/pacman.wasm.map ]; then
-    cp $output_folder/pacman.wasm.map dist
+cp $output_folder/deps/spiritus.data dist
+if [ -f $output_folder/spiritus.wasm.map ]; then
+    cp $output_folder/spiritus.wasm.map dist
 fi
 
 if [ "$serve" = 'true' ]; then
