@@ -30,10 +30,10 @@ jobs:
       
       - name: Extract SDL2 DLLs
         run: |
-          7z x ./sdl2.zip -o./ SDL2.dll
-          7z x ./sdl2_image.zip -o./ SDL2_image.dll
-          7z x ./sdl2_ttf.zip -o./ SDL2_ttf.dll
-          7z x ./sdl2_mixer.zip -o./ SDL2_mixer.dll
+          7z x ./sdl2.zip SDL2.dll
+          7z x ./sdl2_image.zip SDL2_image.dll
+          7z x ./sdl2_ttf.zip SDL2_ttf.dll
+          7z x ./sdl2_mixer.zip SDL2_mixer.dll
 
       - name: Setup Rust (Windows)
         uses: actions-rs/toolchain@v1
