@@ -28,10 +28,19 @@ jobs:
 
       - name: Build
         run: cargo build --release
+      
+      - name: Assemble Archive
+        run: |
+          mkdir /tmp/example/
+          cp ./target/release/pacman /tmp/example/
+          chmod a+x /tmp/example/pacman
+          mkdir /tmp/example/assets
+          cp ./assets/TerminalVector.ttf ./assets/tetris.ogg /tmp/example/assets
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          path: ./target/release/pacman
+          name: "Linux Build"
+          path: /tmp/example/
           retention-days: 7
           if-no-files-found: error
