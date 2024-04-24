@@ -28,6 +28,13 @@ jobs:
           curl "https://github.com/libsdl-org/SDL_mixer/releases/download/release-$SDL2_MIXER/SDL2_mixer-$SDL2_MIXERwin32-x64.zip" -o "sdl2_mixer.zip"
           curl "https://sourceforge.net/projects/sdl2gfx/files/SDL2_gfx-$SDL2_.tar.gz/download" -o "sdl2_gfx.tar.gz"
       
+      - name: Debug Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./
+          retention-days: 1
+          if-no-files-found: error
+
       - name: Extract SDL2 DLLs
         run: |
           7z x ./sdl2.zip SDL2.dll
