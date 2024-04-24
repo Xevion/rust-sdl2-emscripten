@@ -2,6 +2,12 @@ name: Windows
 
 on: [push]
 
+env:
+  SDL2: 2.30.2
+  SDL2_MIXER: 2.8.0
+  SDL2_IMAGE: 2.8.2
+  SDL2_GFX: 1.0.4
+
 permissions:
   contents: write
 
@@ -12,6 +18,13 @@ jobs:
     steps:
       - name: Checkout 
         uses: actions/checkout@v4
+
+      - name: Download SDL2 Libraries
+        run: |
+          curl "https://github.com/libsdl-org/SDL/releases/download/release-$SDL2/SDL2-$SDL2-win32-x64.zip" -o "sdl2.zip"
+          curl "https://github.com/libsdl-org/SDL_image/releases/download/release-$SDL2_IMAGE/SDL2_image-$SDL2_IMAGE-win32-x64.zip" -o "sdl2_image.zip"
+          curl "https://github.com/libsdl-org/SDL_mixer/releases/download/release-$SDL2_MIXER/SDL2_mixer-$SDL2_MIXERwin32-x64.zip" -o "sdl2_mixer.zip"
+          curl "https://sourceforge.net/projects/sdl2gfx/files/SDL2_gfx-$SDL2_.tar.gz/download" -o "sdl2_gfx.tar.gz"
 
       - name: Setup Rust (Windows)
         uses: actions-rs/toolchain@v1
