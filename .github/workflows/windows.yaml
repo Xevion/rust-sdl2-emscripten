@@ -30,11 +30,9 @@ jobs:
       
       - name: Extract SDL2 DLLs
         run: |
-          7z --help
-          7z --version
-          7z x ./sdl2_devel.zip
-          mv ./sdl2/SDL2-${{ env.SDL2 }}/lib/x64/SDL2.dll ./
-          mv ./sdl2/SDL2-${{ env.SDL2 }}/lib/x64/SDL2.lib ./
+          7z x ./sdl2_devel.zip -o"./tmp/"
+          mv ./tmp/SDL2-${{ env.SDL2 }}/lib/x64/SDL2.dll ./
+          mv ./tmp/SDL2-${{ env.SDL2 }}/lib/x64/SDL2.lib ./
           7z x ./sdl2_image.zip SDL2_image.dll
           7z x ./sdl2_ttf.zip SDL2_ttf.dll
           7z x ./sdl2_mixer.zip SDL2_mixer.dll
