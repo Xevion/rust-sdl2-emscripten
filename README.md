@@ -20,7 +20,7 @@ This is an experimental repository while testing a Rust + SDL2 project built wit
   - [X] TTF
   - [ ] GFX
   - All of these libraries are common and necessary for a lot of projects. Ensuring they work is important.
-- [ ] Example of External Javascript Interop
+- [X] Example of External Javascript Interop
   - The basic ability to provide some kind of Javascript binding would be important for a decent web-based project or game.
   - The ability to use localStorage, fetch, or some browser-only API would be important.
 
