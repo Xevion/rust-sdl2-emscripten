@@ -45,6 +45,9 @@ jobs:
           7z x ./sdl2_image_devel.zip -o"./tmp/"
           mv ./tmp/SDL2_image-${{ env.SDL2_IMAGE }}/lib/x64/SDL2_image.dll ./
           mv ./tmp/SDL2_image-${{ env.SDL2_IMAGE }}/lib/x64/SDL2_image.lib ./
+      
+      - name: Install SDL2_gfx
+        run: .\vcpkg.exe install sdl2-gfx --triplet x64-windows
 
       - name: Setup Rust (Windows)
         uses: actions-rs/toolchain@v1
