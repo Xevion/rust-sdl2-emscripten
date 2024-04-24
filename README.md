@@ -39,6 +39,26 @@ While this combination and project is possible, it's not easy, documentation/exa
 
 My worry with a bigger project is that the complexity of the system will grow exponentially, and the time spent on debugging and fixing issues will be much higher than the time spent on actual development.
 
+### Notes
+
+- `build.sh` is the main build script for the Web Assembly target. It's intended for use by both GitHub Actions and local development.
+  - Flags are available to modify the behavior. Inspect the script for more information.
+- Conditional compliation is used often in this project to provide different behavior, mostly for Emscripten.
+  - Sleeping and Timing is handled by Emscripten's `extern` functions, while native builds use `std::thread::sleep`.
+  - [`Store`](./src/store.rs) is a simple wrapper around `LocalStorage` for Emscripten, and has a `Dummy` implementation for native builds (for now).
+- [`config.toml`](./.cargo/config.toml) is used to provide the special flags for the Emscripten target.
+  - [`ASYNCIFY`][emscripten-docs-asyncify] is used to enable the `Asyncify` feature, which is required for the game loop. Learn more [here][emscripten-asyncify].
+  - [`ALLOW_MEMORY_GROWTH`][emscripten-docs-allow-memory-growth] seems to be necessary for SDL2 mostly. It allows the memory to grow dynamically, which is required for SDL2 extensions. Perhaps this can be disabled, but I haven't tried yet.
+  - [`USE_SDL`][emscripten-docs-use-sdl] is required for SDL2.
+  - [`USE_SDL_IMAGE`][emscripten-docs-use-sdl-image] is required for using SDL2's Image extension.
+  - [`USE_SDL_TTF`][emscripten-docs-use-sdl-ttf] is required for using SDL2's TTF extension.
+  - [`USE_SDL_MIXER`][emscripten-docs-use-sdl-mixer] is required for using SDL2's Mixer extension.
+  - [`USE_SDL_GFX`][emscripten-docs-use-sdl-gfx] is required for using SDL2's GFX extension.
+  - [`USE_OGG`][emscripten-docs-use-ogg] is required for using OGG files with SDL2's Mixer extension.
+  - [`SDL2_IMAGE_FORMATS`][emscripten-docs-sdl2-image-formats] is required for specifying the image formats to load with SDL2's Image.
+  - [`SDL2_MIXER_FORMATS`][emscripten-docs-sdl2-mixer-formats] is required for specifying the audio formats to load with SDL2's Mixer.
+  - Please check [`config.toml`](./.cargo/config.toml) for an example of how to specify it, as well as the format of each flag; some take a list of values or a version number, or just `1`.
+
 ### Resources
 
 A list of various resources I relied on and studied while building this project. Organized in descending 'usefulness'.
@@ -69,3 +89,15 @@ A list of various resources I relied on and studied while building this project.
   - This is mostly interesting because it has an egui implementation; egui is very cool for demos, developer tooling, debug menus, and so on.
   - The only thing I don't understand is where SDL2 is; there is almost no real code referencing SDL2 except a `SDL2Backend` provided by the `egui` crate. Weird.
   - While devoid of anything particularly interesting for my own needs, it has a demo [here](https://coderedart.github.io/rust-sdl2-wasm/)
+
+[emscripten-asyncify]: https://emscripten.org/docs/porting/asyncify.html
+[emscripten-docs-asyncify]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#asyncify
+[emscripten-docs-allow-memory-growth]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#allow-memory-growth
+[emscripten-docs-use-sdl]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#use-sdl
+[emscripten-docs-use-sdl-image]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#use-sdl-image
+[emscripten-docs-use-sdl-ttf]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#use-sdl-ttf
+[emscripten-docs-use-sdl-mixer]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#use-sdl-mixer
+[emscripten-docs-use-sdl-gfx]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#use-sdl-gfx
+[emscripten-docs-use-ogg]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#use-ogg
+[emscripten-docs-sdl2-image-formats]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#sdl2-image-formats
+[emscripten-docs-sdl2-mixer-formats]: https://emscripten.org/docs/tools_reference/settings_reference.html?highlight=environment#sdl2-mixer-formats
