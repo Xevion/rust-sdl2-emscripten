@@ -1,5 +1,3 @@
-use std::{io::Seek, path::PathBuf};
-
 #[cfg(not(target_os = "emscripten"))]
 pub struct Store {
     file: std::fs::File,
@@ -10,7 +8,7 @@ pub struct Store;
 
 #[cfg(not(target_os = "emscripten"))]
 impl Store {
-    pub fn new () -> Self {
+    pub fn new() -> Self {
         let path = Store::get_path();
         let file = std::fs::OpenOptions::new()
             .read(true)
@@ -21,7 +19,7 @@ impl Store {
         Store { file }
     }
 
-    fn get_path() -> PathBuf {
+    fn get_path() -> std::path::PathBuf {
         use std::env;
         let mut path = env::current_exe().unwrap();
         path.pop();
@@ -38,7 +36,7 @@ impl Store {
     }
 
     pub fn set_volume(&mut self, volume: u32) {
-        use std::io::Write;
+        use std::io::{Seek, Write};
 
         self.file.set_len(0).unwrap();
         self.file.seek(std::io::SeekFrom::Start(0)).unwrap();
@@ -54,7 +52,7 @@ extern "C" {
 
 #[cfg(target_os = "emscripten")]
 impl Store {
-    pub fn new () -> Self {
+    pub fn new() -> Self {
         Store
     }
 
