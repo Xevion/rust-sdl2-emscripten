@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install SDL2 Packages
-        run: sudo brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf sdl2_gfx
+        run: brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf sdl2_gfx
 
       - name: Setup Rust Toolchain (MacOS)
         uses: dtolnay/rust-toolchain@stable
