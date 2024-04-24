@@ -105,7 +105,7 @@ fn main() {
     )
     .unwrap();
 
-    let storage = store::Store {};
+    let mut storage = store::Store::new();
 
     let mut volume = storage.volume().map_or_else(
         || {
