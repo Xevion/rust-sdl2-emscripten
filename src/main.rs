@@ -4,14 +4,13 @@ use std::time::Duration;
 use sdl2::event::Event;
 use sdl2::image::LoadTexture;
 use sdl2::keyboard::Keycode;
-use sdl2::mixer::{self, LoaderRWops, Music};
+use sdl2::mixer;
 use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
 use sdl2::rwops::RWops;
-use sdl2::sys::AUDIO_S16LSB;
 use sdl2::ttf;
 
-static FONT_DATA: &[u8] = include_bytes!("../assets/TerminalVector.ttf");
+// static FONT_DATA: &[u8] = include_bytes!("../assets/TerminalVector.ttf");
 static MUSIC_DATA: &[u8] = include_bytes!("../assets/tetris.ogg");
 static BLACK: Color = Color::RGB(0, 0, 0);
 
@@ -85,18 +84,18 @@ fn main() {
     )
     .unwrap();
 
-    let mut volume = 3;
+    let mut volume = 1;
     mixer::Music::set_volume(volume);
 
     let music_data = RWops::from_bytes(MUSIC_DATA).unwrap();
-    let music = music_data.load_music().unwrap();
+    let music = mixer::LoaderRWops::load_music(&music_data).unwrap();
     music.play(-1).unwrap();
 
     let mut prev = now();
 
-    let font_data = RWops::from_bytes(FONT_DATA).unwrap();
-    let font_size = 12;
-    let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
+    // let font_data = RWops::from_bytes(FONT_DATA).unwrap();
+    // let font_size = 12;
+    // let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
     let font = ttf_ctx
         .load_font("./assets/TerminalVector.ttf", 12)
         .unwrap();
