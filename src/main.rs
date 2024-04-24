@@ -1,3 +1,4 @@
+// #![windows_subsystem = "windows"]
 use std::process;
 use std::time::Duration;
 
@@ -55,21 +56,34 @@ fn ttf_context() -> &'static ttf::Sdl2TtfContext {
     Box::leak(Box::new(ttf::init().unwrap()))
 }
 
+#[cfg(not(target_os = "windows"))]
+fn hide_console_window() {}
+
+#[cfg(target_os = "windows")]
+fn hide_console_window() {
+    if !atty::is(atty::Stream::Stdout) {
+        unsafe { winapi::um::wincon::FreeConsole() };
+    }
+}
+
 fn main() {
+    hide_console_window();
+    
     let ctx = sdl2::init().unwrap();
     let video_ctx = ctx.video().unwrap();
-
+    
     let window = match video_ctx
-        .window("rust-sdl2-emscripten", 640, 480)
-        .position_centered()
-        .resizable()
-        .allow_highdpi()
-        .opengl()
-        .build()
+    .window("rust-sdl2-emscripten", 640, 480)
+    .position_centered()
+    .resizable()
+    .allow_highdpi()
+    .opengl()
+    .build()
     {
         Ok(window) => window,
         Err(err) => panic!("failed to create window: {}", err),
     };
+    
 
     let mut canvas = match window.into_canvas().accelerated().build() {
         Ok(canvas) => canvas,

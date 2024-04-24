@@ -15,5 +15,9 @@ tracing = { version = "0.1.37", features = ["max_level_debug", "release_max_leve
 tracing-error = "0.2.0"
 tracing-subscriber = {version = "0.3.17", features = ["env-filter"]}
 
+[target.'cfg(target_os = "windows")'.dependencies]
+atty = "0.2"
+winapi = {version = "0.3", features = ["wincon", "winuser"]}
+
 [target.'cfg(target_os = "emscripten")'.dependencies]
 libc = "0.2.16"

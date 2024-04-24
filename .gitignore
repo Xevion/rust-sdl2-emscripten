@@ -2,5 +2,7 @@
 /dist
 .idea
 *.dll
+*.lib
+*.exe
 node_modules
 assets/build.css
