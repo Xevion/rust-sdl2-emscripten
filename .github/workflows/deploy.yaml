@@ -14,13 +14,16 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout 
+        uses: actions/checkout@v4
 
-      - uses: mymindstorm/setup-emsdk@v11
+      - name: Setup Emscripten SDK
+        uses: mymindstorm/setup-emsdk@v11
         with:
           version: 3.1.43
 
-      - uses: actions-rs/toolchain@v1
+      - name: Setup Rust WASM32 Toolchain
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: wasm32-unknown-emscripten
@@ -29,14 +32,14 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
         with:
           version: 8
           run_install: true
 
-      - name: Build # build
-        run: ./scripts/build.sh -er # release, skip emsdk
+      - name: Build
+        run: ./scripts/build.sh -er # release mode, skip emsdk
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v2
