@@ -13,9 +13,9 @@
 }
 
 canvas {
-    @apply w-full h-full block mx-auto bg-black;
+    @apply w-full h-[65vh] min-h-[200px] block mx-auto bg-black;
 }
 
 .code {
-    @apply px-1 rounded font-mono bg-zinc-900 border border-zinc-700
+    @apply px-1 rounded font-mono bg-zinc-900 border border-zinc-700 lowercase;
 }
