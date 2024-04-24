@@ -211,7 +211,7 @@ jobs:
       - name: Acquire Package Version
         run: |
           cargo binstall toml-cli -y
-          echo "PACKAGE_VERSION=$(toml get ./Cargo.toml package.version --raw)" >> $GITHUB_ENV
+          echo "PACKAGE_VERSION=$(toml get ./Cargo.toml package.version --raw)" >> $env:GITHUB_ENV
 
 
       - name: Upload Artifact
