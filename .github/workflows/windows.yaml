@@ -48,6 +48,8 @@ jobs:
       
       - name: Install SDL2_gfx
         run: |
+          ls C:\vcpkg\packages\sdl2-gfx_x64-windows\share\sdl2-gfx\
+          ls C:\vcpkg\installed\sdl2-gfx_x64-windows\share\sdl2-gfx\
           ${{ env.VCPKG_ROOT }}\vcpkg.exe install sdl2-gfx --triplet x64-windows
           cp ${{ env.VCPKG_ROOT }}\packages\sdl2-gfx_x64-windows\share\sdl2-gfx\SDL2_gfx.lib ./
           cp ${{ env.VCPKG_ROOT }}\packages\sdl2-gfx_x64-windows\share\sdl2-gfx\SDL2_gfx.dll ./
