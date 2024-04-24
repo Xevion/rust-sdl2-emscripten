@@ -75,7 +75,7 @@ jobs:
           cp ./target/release/spiritus /tmp/example/
           chmod a+x /tmp/example/spiritus
           mkdir /tmp/example/assets
-          cp ./assets/TerminalVector.ttf ./assets/tetris.ogg ./assets/fruit.png /tmp/example/assets
+          cp ./assets/TerminalVector.ttf ./assets/fruit.png /tmp/example/assets
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -113,7 +113,7 @@ jobs:
           mkdir /tmp/example/
           cp ./target/release/spiritus /tmp/example/
           mkdir /tmp/example/assets
-          cp ./assets/TerminalVector.ttf ./assets/tetris.ogg ./assets/fruit.png /tmp/example/assets
+          cp ./assets/TerminalVector.ttf ./assets/fruit.png /tmp/example/assets
       
       - name: Acquire Package Version
         run: |
@@ -189,7 +189,7 @@ jobs:
           Move-Item -Path ./target/release/spiritus.exe -Destination ./release/
           Move-Item -Path ./SDL2.dll, ./SDL2_image.dll, ./SDL2_ttf.dll, ./SDL2_mixer.dll, ./SDL2_gfx.dll -Destination ./release/
           New-Item -Type Directory ./release/assets/
-          Move-Item -Path ./assets/TerminalVector.ttf, ./assets/tetris.ogg, ./assets/fruit.png -Destination ./release/assets/
+          Move-Item -Path ./assets/TerminalVector.ttf, ./assets/fruit.png -Destination ./release/assets/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
