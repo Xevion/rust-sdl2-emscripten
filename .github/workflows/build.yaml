@@ -81,11 +81,48 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: Linux_x64
           path: /tmp/example/
           retention-days: 7
           if-no-files-found: error
   
+  macos:
+    runs-on: macos-13
+
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v4
+
+      - name: Install SDL2 Packages
+        run: sudo brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf sdl2_gfx
+
+      - name: Setup Rust Toolchain (MacOS)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          target: x86_64-apple-darwin
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release
+      
+      - name: Assemble Archive
+        run: |
+          mkdir /tmp/example/
+          cp ./target/release/spiritus /tmp/example/
+          chmod a+x /tmp/example/spiritus
+          mkdir /tmp/example/assets
+          cp ./assets/TerminalVector.ttf ./assets/tetris.ogg ./assets/fruit.png /tmp/example/assets
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacOS_x64
+          path: /tmp/example/
+          retention-days: 7
+          if-no-files-found: error
+
   windows:
     env:  
       SDL2: 2.30.2
@@ -152,7 +189,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: Windows_x64
           path: ./release/
           retention-days: 7
           if-no-files-found: error
