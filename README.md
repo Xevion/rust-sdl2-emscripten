@@ -84,8 +84,8 @@ A list of various resources I relied on and studied while building this project.
 - [KyleMiles/Rust-SDL-Emscripten-Template/](https://github.com/KyleMiles/Rust-SDL-Emscripten-Template/)
   - Has some special javascript interop code
 - [hello-rust-sdl2-wasm](https://github.com/awwsmm/hello-rust-sdl2-wasm)
--  A bit of a weird repository, I'm not sure that the creator knows Rust that well, but it compiles.
--  Note that the `asmjs-unknown-emscripten` target is deprecated, and you should use `wasm32-unknown-emscripten` instead. You'll need to change all the files, flags etc. to make it match.
+  -  A bit of a weird repository, I'm not sure that the creator knows Rust that well, but it compiles.
+  -  Note that the `asmjs-unknown-emscripten` target is deprecated, and you should use `wasm32-unknown-emscripten` instead. You'll need to change all the files, flags etc. to make it match.
 - [arskiy/chess](https://github.com/arskiy/chess/)
   - Image usage, decent code example
   - Has more advanced javascript config and examples to look at.
