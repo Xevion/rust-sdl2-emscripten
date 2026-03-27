@@ -68,23 +68,22 @@ fn hide_console_window() {
 
 fn main() {
     hide_console_window();
-    
+
     let ctx = sdl2::init().unwrap();
     let video_ctx = ctx.video().unwrap();
     let mut window_size = Point::new(640, 480);
-    
+
     let window = match video_ctx
-    .window("rust-sdl2-emscripten", window_size.x as u32, window_size.y as u32)
-    .position_centered()
-    .resizable()
-    .allow_highdpi()
-    .opengl()
-    .build()
+        .window("rust-sdl2-emscripten", window_size.x as u32, window_size.y as u32)
+        .position_centered()
+        .resizable()
+        .allow_highdpi()
+        .opengl()
+        .build()
     {
         Ok(window) => window,
         Err(err) => panic!("failed to create window: {}", err),
     };
-    
 
     let mut canvas = match window.into_canvas().accelerated().build() {
         Ok(canvas) => canvas,
@@ -96,13 +95,7 @@ fn main() {
 
     let ttf_ctx = ttf_context();
 
-    mixer::open_audio(
-        44_100,
-        sdl2::mixer::AUDIO_S16LSB,
-        sdl2::mixer::DEFAULT_CHANNELS,
-        1024,
-    )
-    .unwrap();
+    mixer::open_audio(44_100, sdl2::mixer::AUDIO_S16LSB, sdl2::mixer::DEFAULT_CHANNELS, 1024).unwrap();
 
     let mut storage = store::Store::new();
 
@@ -126,9 +119,7 @@ fn main() {
     // let font_size = 12;
     // let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
 
-    let font = ttf_ctx
-        .load_font("./assets/TerminalVector.ttf", 12)
-        .unwrap();
+    let font = ttf_ctx.load_font("./assets/TerminalVector.ttf", 12).unwrap();
 
     let fruit_atlas = texture_creator
         .load_texture("./assets/fruit.png")
@@ -169,9 +160,7 @@ fn main() {
                 } => {
                     process::exit(1);
                 }
-                Event::KeyDown {
-                    keycode: Some(key), ..
-                } => match key {
+                Event::KeyDown { keycode: Some(key), .. } => match key {
                     Keycode::Space => {
                         frame += 1;
                         if frame > 7 {
@@ -187,11 +176,7 @@ fn main() {
                         moved = true;
                     }
                     Keycode::Up => {
-                        if ctx
-                            .keyboard()
-                            .mod_state()
-                            .contains(sdl2::keyboard::Mod::LSHIFTMOD)
-                        {
+                        if ctx.keyboard().mod_state().contains(sdl2::keyboard::Mod::LSHIFTMOD) {
                             if volume < 128 {
                                 volume += 1;
                                 mixer::Music::set_volume(volume as i32);
@@ -204,11 +189,7 @@ fn main() {
                     }
                     Keycode::Down => {
                         // Shift means modify volume
-                        if ctx
-                            .keyboard()
-                            .mod_state()
-                            .contains(sdl2::keyboard::Mod::LSHIFTMOD)
-                        {
+                        if ctx.keyboard().mod_state().contains(sdl2::keyboard::Mod::LSHIFTMOD) {
                             if volume > 0 {
                                 volume -= 1;
                                 mixer::Music::set_volume(volume as i32);
@@ -280,22 +261,12 @@ fn main() {
 
         // draw fps counter
         let text = format!("{:.0}", avg_fps);
-        let surface = font
-            .render(&text)
-            .blended(Color::RGBA(255, 255, 255, 50))
-            .unwrap();
-        let texture = texture_creator
-            .create_texture_from_surface(&surface)
-            .unwrap();
+        let surface = font.render(&text).blended(Color::RGBA(255, 255, 255, 50)).unwrap();
+        let texture = texture_creator.create_texture_from_surface(&surface).unwrap();
         let _ = canvas.copy(
             &texture,
             None,
-            Rect::new(
-                window_size.x - (25i32 * text.len() as i32),
-                0,
-                25 * text.len() as u32,
-                40,
-            ),
+            Rect::new(window_size.x - (25i32 * text.len() as i32), 0, 25 * text.len() as u32, 40),
         );
 
         canvas.present();

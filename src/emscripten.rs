@@ -6,11 +6,7 @@ pub mod emscripten {
     extern "C" {
         pub fn emscripten_get_now() -> f64;
         pub fn emscripten_sleep(ms: c_uint);
-        pub fn emscripten_get_element_css_size(
-            target: *const u8,
-            width: *mut f64,
-            height: *mut f64,
-        ) -> i32;
+        pub fn emscripten_get_element_css_size(target: *const u8, width: *mut f64, height: *mut f64) -> i32;
     }
 
     // milliseconds since start of program

@@ -9,7 +9,7 @@ A [demo](https://xevion.github.io/rust-sdl2-emscripten/) project to explore Rust
 
 ### Goals
 
-- [ ] Emscrimpten Looping Method
+- [ ] Emscripten Looping Method
   - [X] Asyncify
   - [ ] `emscripten_set_main_loop`
 - [X] Automatic Builds
