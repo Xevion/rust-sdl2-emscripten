@@ -43,9 +43,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Update apt package index
+        if: runner.os == 'Linux'
+        run: sudo apt-get update
+
       - name: Install SDL2 packages (apt/brew)
         if: matrix.sdl2_install != ''
         run: ${{ matrix.sdl2_install }}
+
+      - name: Set Homebrew library paths
+        if: runner.os == 'macOS'
+        run: |
+          echo "LIBRARY_PATH=$(brew --prefix)/lib" >> $GITHUB_ENV
+          echo "CPATH=$(brew --prefix)/include" >> $GITHUB_ENV
 
       - name: Download SDL2 libraries (Windows)
         if: runner.os == 'Windows'

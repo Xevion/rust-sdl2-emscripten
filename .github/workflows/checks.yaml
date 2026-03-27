@@ -27,7 +27,9 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Install SDL2 packages
-        run: sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-gfx-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-gfx-dev
 
       - name: Run clippy
         run: cargo clippy --all-targets -- -D warnings

@@ -25,7 +25,12 @@ jobs:
           version: 3.1.74
 
       - name: Pre-warm Emscripten port cache
-        run: embuilder build sdl2 sdl2_ttf sdl2_image sdl2_mixer
+        run: |
+          echo "int main(){return 0;}" > /tmp/warmup.c
+          emcc /tmp/warmup.c -o /tmp/warmup.js \
+            -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_MIXER=2 -sUSE_OGG=1 \
+            -sUSE_SDL_GFX=2 -sUSE_SDL_TTF=2 -sSDL2_IMAGE_FORMATS="['png']" \
+            -sASYNCIFY -sALLOW_MEMORY_GROWTH=1
 
       - name: Install Rust toolchain
         uses: mkroening/rust-toolchain-toml@main
