@@ -61,7 +61,8 @@ fn hide_console_window() {}
 
 #[cfg(target_os = "windows")]
 fn hide_console_window() {
-    if !atty::is(atty::Stream::Stdout) {
+    use std::io::IsTerminal;
+    if !std::io::stdout().is_terminal() {
         unsafe { winapi::um::wincon::FreeConsole() };
     }
 }
@@ -155,27 +156,27 @@ fn main() {
                 },
                 Event::Quit { .. }
                 | Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
+                    keycode: Some(Keycode::ESCAPE),
                     ..
                 } => {
                     process::exit(1);
                 }
                 Event::KeyDown { keycode: Some(key), .. } => match key {
-                    Keycode::Space => {
+                    Keycode::SPACE => {
                         frame += 1;
                         if frame > 7 {
                             frame = 0;
                         }
                     }
-                    Keycode::Left => {
+                    Keycode::LEFT => {
                         point.x -= 32;
                         moved = true;
                     }
-                    Keycode::Right => {
+                    Keycode::RIGHT => {
                         point.x += 32;
                         moved = true;
                     }
-                    Keycode::Up => {
+                    Keycode::UP => {
                         if ctx.keyboard().mod_state().contains(sdl2::keyboard::Mod::LSHIFTMOD) {
                             if volume < 128 {
                                 volume += 1;
@@ -187,8 +188,7 @@ fn main() {
                             moved = true;
                         }
                     }
-                    Keycode::Down => {
-                        // Shift means modify volume
+                    Keycode::DOWN => {
                         if ctx.keyboard().mod_state().contains(sdl2::keyboard::Mod::LSHIFTMOD) {
                             if volume > 0 {
                                 volume -= 1;
