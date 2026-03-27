@@ -1,22 +1,26 @@
-# List available recipes
+# Display available recipes
 default:
     @just --list
 
 # Run cargo check
 check:
-    cargo check
+    @echo "Checking format..."
+    @cargo fmt --all -- --check || echo "Format issues detected (run 'just format' to fix)"
+    @echo "Running clippy..."
+    @cargo clippy --all-targets -- -D warnings
+    @echo "Check complete!"
 
-# Run cargo clippy
-lint:
-    cargo clippy -- -D warnings
+alias lint := check
+
+# Run tests
+test:
+    cargo nextest run --no-fail-fast
 
 # Format code
-fmt:
-    cargo fmt
+format:
+    cargo fmt --all
 
-# Check formatting without modifying
-fmt-check:
-    cargo fmt -- --check
+alias fmt := format
 
 # Build native release binary
 build:

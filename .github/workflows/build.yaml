@@ -1,168 +1,62 @@
-name: Build
+name: Builds
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  wasm:
-    runs-on: ubuntu-latest
+  build:
+    name: Build (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: spiritus
+            sdl2_install: sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-gfx-dev
+          - os: macos-15
+            target: aarch64-apple-darwin
+            artifact_name: spiritus
+            sdl2_install: brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf sdl2_gfx
+          - os: windows-latest
+            target: x86_64-pc-windows-gnu
+            artifact_name: spiritus.exe
+            sdl2_install: ""
+    runs-on: ${{ matrix.os }}
 
-    permissions:
-      pages: write
-      id-token: write
-
-    steps:
-      - name: Checkout 
-        uses: actions/checkout@v4
-
-      - name: Setup Emscripten SDK
-        uses: mymindstorm/setup-emsdk@v14
-        with:
-          version: 3.1.43
-
-      - name: Setup Rust (WASM32 Emscripten)
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          target: wasm32-unknown-emscripten
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
-          run_install: true
-
-      - name: Build
-        run: ./scripts/build.sh -er # release mode, skip emsdk
-
-      - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist/'
-          retention-days: 7
-
-      - name: Deploy
-        uses: actions/deploy-pages@v4
-  
-  linux:
-    runs-on: ubuntu-latest
     env:
-      TARGET: x86_64-unknown-linux-gnu
-
-    steps:
-      - name: Checkout 
-        uses: actions/checkout@v4
-
-      - name: Install SDL2 Packages
-        run: sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libsdl2-gfx-dev
-
-      - name: Setup Rust Toolchain (Linux)
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          target: ${{ env.TARGET }}
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build
-        run: cargo build --release
-      
-      - name: Assemble Archive
-        run: |
-          mkdir /tmp/example/
-          cp ./target/release/spiritus /tmp/example/
-          chmod a+x /tmp/example/spiritus
-          mkdir /tmp/example/assets
-          cp ./assets/TerminalVector.ttf ./assets/fruit.png /tmp/example/assets
-      
-      - name: Install Cargo Binstall
-        uses: cargo-bins/cargo-binstall@main
-
-      - name: Acquire Package Version
-        run: |
-          cargo binstall toml-cli -y
-          echo "PACKAGE_VERSION=$(toml get ./Cargo.toml package.version --raw)" >> $GITHUB_ENV
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: "spiritus-${{ env.PACKAGE_VERSION }}-${{ env.TARGET }}"
-          path: /tmp/example/
-          retention-days: 7
-          if-no-files-found: error
-  
-  macos:
-    runs-on: macos-13
-    env:
-      TARGET: x86_64-apple-darwin
-
-    steps:
-      - name: Checkout 
-        uses: actions/checkout@v4
-
-      - name: Install SDL2 Packages
-        run: brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf sdl2_gfx
-
-      - name: Setup Rust Toolchain (MacOS)
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          target: ${{ env.TARGET }}
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build
-        run: cargo build --release
-      
-      - name: Assemble Archive
-        run: |
-          mkdir /tmp/example/
-          cp ./target/release/spiritus /tmp/example/
-          mkdir /tmp/example/assets
-          cp ./assets/TerminalVector.ttf ./assets/fruit.png /tmp/example/assets
-      
-      - name: Install Cargo Binstall
-        uses: cargo-bins/cargo-binstall@main
-
-      - name: Acquire Package Version
-        run: |
-          cargo binstall toml-cli -y
-          echo "PACKAGE_VERSION=$(toml get ./Cargo.toml package.version --raw)" >> $GITHUB_ENV
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: "spiritus-${{ env.PACKAGE_VERSION }}-${{ env.TARGET }}"
-          path: /tmp/example/
-          retention-days: 7
-          if-no-files-found: error
-
-  windows:
-    env:
-      TARGET: x86_64-pc-windows-gnu
       SDL2: 2.30.2
       SDL2_TTF: 2.22.0
       SDL2_MIXER: 2.8.0
       SDL2_IMAGE: 2.8.2
-      # SDL2_GFX: 1.0.4
-    runs-on: windows-latest
 
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download SDL2 Libraries
+      - name: Install SDL2 packages (apt/brew)
+        if: matrix.sdl2_install != ''
+        run: ${{ matrix.sdl2_install }}
+
+      - name: Download SDL2 libraries (Windows)
+        if: runner.os == 'Windows'
         run: |
           curl -L "https://github.com/libsdl-org/SDL/releases/download/release-${{ env.SDL2 }}/SDL2-devel-${{ env.SDL2 }}-VC.zip" -o "sdl2_devel.zip"
           curl -L "https://github.com/libsdl-org/SDL_mixer/releases/download/release-${{ env.SDL2_MIXER }}/SDL2_mixer-devel-${{ env.SDL2_MIXER }}-VC.zip" -o "sdl2_mixer_devel.zip"
           curl -L "https://github.com/libsdl-org/SDL_ttf/releases/download/release-${{ env.SDL2_TTF }}/SDL2_ttf-devel-${{ env.SDL2_TTF }}-VC.zip" -o "sdl2_ttf_devel.zip"
           curl -L "https://github.com/libsdl-org/SDL_image/releases/download/release-${{ env.SDL2_IMAGE }}/SDL2_image-devel-${{ env.SDL2_IMAGE }}-VC.zip" -o "sdl2_image_devel.zip"
-      
-      - name: Extract SDL2 DLLs
+
+      - name: Extract SDL2 DLLs (Windows)
+        if: runner.os == 'Windows'
         run: |
           7z x ./sdl2_devel.zip -o"./tmp/"
           mv ./tmp/SDL2-${{ env.SDL2 }}/lib/x64/SDL2.dll ./
@@ -179,17 +73,19 @@ jobs:
           7z x ./sdl2_image_devel.zip -o"./tmp/"
           mv ./tmp/SDL2_image-${{ env.SDL2_IMAGE }}/lib/x64/SDL2_image.dll ./
           mv ./tmp/SDL2_image-${{ env.SDL2_IMAGE }}/lib/x64/SDL2_image.lib ./
-      
-      - name: Install SDL2_gfx
+
+      - name: Install SDL2_gfx (Windows)
+        if: runner.os == 'Windows'
         run: |
           C:\vcpkg\vcpkg.exe install sdl2-gfx:x64-windows-release
           cp C:\vcpkg\packages\sdl2-gfx_x64-windows-release\bin\SDL2_gfx.dll ./
           cp C:\vcpkg\packages\sdl2-gfx_x64-windows-release\lib\SDL2_gfx.lib ./
-      
-      - name: Setup Rust (Windows)
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ env.TARGET }}
+
+      - name: Install Rust toolchain
+        uses: mkroening/rust-toolchain-toml@main
+
+      - name: Add target
+        run: rustup target add ${{ matrix.target }}
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -197,27 +93,33 @@ jobs:
       - name: Build
         run: cargo build --release
 
-      - name: Prepare Archive
-        run: |
-          New-Item -Type Directory ./release/
-          Move-Item -Path ./target/release/spiritus.exe -Destination ./release/
-          Move-Item -Path ./SDL2.dll, ./SDL2_image.dll, ./SDL2_ttf.dll, ./SDL2_mixer.dll, ./SDL2_gfx.dll -Destination ./release/
-          New-Item -Type Directory ./release/assets/
-          Move-Item -Path ./assets/TerminalVector.ttf, ./assets/fruit.png -Destination ./release/assets/
-
-      - name: Install Cargo Binstall
-        uses: cargo-bins/cargo-binstall@main
-
       - name: Acquire Package Version
+        id: get_version
+        shell: bash
         run: |
-          cargo binstall toml-cli -y
-          echo "PACKAGE_VERSION=$(toml get ./Cargo.toml package.version --raw)" >> $env:GITHUB_ENV
+          set -euo pipefail
+          echo "version=$(cargo metadata --format-version 1 --no-deps | jq '.packages[0].version' -r)" >> $GITHUB_OUTPUT
 
+      - name: Assemble archive (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p /tmp/spiritus/assets
+          cp ./target/release/${{ matrix.artifact_name }} /tmp/spiritus/
+          chmod a+x /tmp/spiritus/${{ matrix.artifact_name }}
+          cp ./assets/TerminalVector.ttf ./assets/fruit.png /tmp/spiritus/assets
+
+      - name: Assemble archive (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          New-Item -Type Directory ./release/assets/
+          Move-Item -Path ./target/release/${{ matrix.artifact_name }} -Destination ./release/
+          Move-Item -Path ./SDL2.dll, ./SDL2_image.dll, ./SDL2_ttf.dll, ./SDL2_mixer.dll, ./SDL2_gfx.dll -Destination ./release/
+          Move-Item -Path ./assets/TerminalVector.ttf, ./assets/fruit.png -Destination ./release/assets/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "spiritus-${{ env.PACKAGE_VERSION }}-${{ env.TARGET }}"
-          path: ./release/
+          name: "spiritus-${{ steps.get_version.outputs.version }}-${{ matrix.target }}"
+          path: ${{ runner.os == 'Windows' && './release/' || '/tmp/spiritus/' }}
           retention-days: 7
           if-no-files-found: error

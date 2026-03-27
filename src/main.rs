@@ -232,8 +232,12 @@ fn main() {
     let music = mixer::LoaderRWops::load_music(&music_data).expect("failed to load music");
     music.play(-1).expect("failed to play music");
 
-    let font = ttf_ctx.load_font("./assets/TerminalVector.ttf", 12).expect("failed to load font");
-    let fruit_atlas = texture_creator.load_texture("./assets/fruit.png").expect("could not load texture");
+    let font = ttf_ctx
+        .load_font("./assets/TerminalVector.ttf", 12)
+        .expect("failed to load font");
+    let fruit_atlas = texture_creator
+        .load_texture("./assets/fruit.png")
+        .expect("could not load texture");
 
     let target_fps = 60;
     let frame_time = Duration::from_secs_f32(1.0) / target_fps;
@@ -286,7 +290,12 @@ fn main() {
         let _ = canvas.copy(
             &texture,
             None,
-            Rect::new(state.window_size.x - (25i32 * text.len() as i32), 0, 25 * text.len() as u32, 40),
+            Rect::new(
+                state.window_size.x - (25i32 * text.len() as i32),
+                0,
+                25 * text.len() as u32,
+                40,
+            ),
         );
 
         canvas.present();

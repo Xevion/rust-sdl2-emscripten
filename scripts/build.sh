@@ -37,8 +37,7 @@ fi
 
 if [ "$skip_emsdk" = 'false' ]; then
     echo "Activating Emscripten"
-    # SDL2-TTF requires 3.1.43, fails to build on latest
-    ./../emsdk/emsdk activate 3.1.43
+    ./../emsdk/emsdk activate 3.1.74
     source ../emsdk/emsdk_env.sh
 fi
 
@@ -52,7 +51,7 @@ else
 fi
 
 echo "Generating CSS"
-pnpx postcss-cli ./assets/styles.scss -o ./assets/build.css
+pnpm exec postcss ./assets/styles.scss -o ./assets/build.css
 
 echo "Copying WASM files"
 mkdir -p dist
