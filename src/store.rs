@@ -14,6 +14,7 @@ impl Store {
             .read(true)
             .write(true)
             .create(true)
+            .truncate(false)
             .open(&path)
             .unwrap();
         Store { file }

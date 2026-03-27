@@ -3,6 +3,9 @@ name = "spiritus"
 version = "0.2.0"
 edition = "2021"
 
+[lints.clippy]
+all = { level = "deny" }
+
 [profile.release]
 opt-level = "z"
 lto = true

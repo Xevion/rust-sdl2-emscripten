@@ -1,4 +1,3 @@
-use std::process;
 use std::time::Duration;
 
 use sdl2::event::Event;
@@ -44,14 +43,14 @@ fn sleep(ms: u32) {
 
 #[cfg(not(target_os = "emscripten"))]
 fn ttf_context() -> ttf::Sdl2TtfContext {
-    ttf::init().unwrap()
+    ttf::init().expect("failed to initialize SDL2_ttf")
 }
 
-// Honestly, I don't know why this is necessary. I'm just copying from https://github.com/aelred/tetris/blob/0ad88153db1ca7962b42277504c0f7f9f3c675a9/tetris-sdl/src/main.rs#L88-L92
+// Deliberately leak so we get a static lifetime on Emscripten.
+// See https://github.com/aelred/tetris/blob/0ad88153db/tetris-sdl/src/main.rs#L88-L92
 #[cfg(target_os = "emscripten")]
 fn ttf_context() -> &'static ttf::Sdl2TtfContext {
-    // Deliberately leak so we get a static lifetime
-    Box::leak(Box::new(ttf::init().unwrap()))
+    Box::leak(Box::new(ttf::init().expect("failed to initialize SDL2_ttf")))
 }
 
 #[cfg(not(target_os = "windows"))]
@@ -65,175 +64,204 @@ fn hide_console_window() {
     }
 }
 
+struct GameState {
+    position: Point,
+    mouse: Point,
+    window_size: Point,
+    frame: i32,
+    volume: u32,
+    previous_focus: bool,
+    running: bool,
+    storage: store::Store,
+    prev_time: f64,
+    frame_count: u64,
+    avg_fps: f64,
+}
+
+impl GameState {
+    fn new(window_size: Point) -> Self {
+        let mut storage = store::Store::new();
+        let volume = storage.volume().unwrap_or_else(|| {
+            println!("No volume stored, using default");
+            1
+        });
+        println!("Volume: {}", volume);
+        mixer::Music::set_volume(volume as i32);
+
+        Self {
+            position: Point::new(0, 0),
+            mouse: Point::new(0, 0),
+            window_size,
+            frame: 0,
+            volume,
+            previous_focus: false,
+            running: true,
+            storage,
+            prev_time: now(),
+            frame_count: 0,
+            avg_fps: 0.0,
+        }
+    }
+
+    fn handle_event(&mut self, event: Event, keyboard_mod: sdl2::keyboard::Mod) -> bool {
+        let mut moved = false;
+        match event {
+            Event::MouseMotion { x, y, .. } => {
+                self.mouse = Point::new(x, y);
+            }
+            Event::Window {
+                win_event: sdl2::event::WindowEvent::Resized(w, h),
+                ..
+            } => {
+                println!("Resized to {}x{}", w, h);
+                self.window_size.x = w;
+                self.window_size.y = h;
+            }
+            Event::Quit { .. }
+            | Event::KeyDown {
+                keycode: Some(Keycode::ESCAPE),
+                ..
+            } => {
+                self.running = false;
+            }
+            Event::KeyDown { keycode: Some(key), .. } => match key {
+                Keycode::SPACE => {
+                    self.frame = (self.frame + 1) % 8;
+                }
+                Keycode::LEFT => {
+                    self.position.x -= 32;
+                    moved = true;
+                }
+                Keycode::RIGHT => {
+                    self.position.x += 32;
+                    moved = true;
+                }
+                Keycode::UP => {
+                    if keyboard_mod.contains(sdl2::keyboard::Mod::LSHIFTMOD) {
+                        if self.volume < 128 {
+                            self.volume += 1;
+                            mixer::Music::set_volume(self.volume as i32);
+                            self.storage.set_volume(self.volume);
+                        }
+                    } else {
+                        self.position.y -= 32;
+                        moved = true;
+                    }
+                }
+                Keycode::DOWN => {
+                    if keyboard_mod.contains(sdl2::keyboard::Mod::LSHIFTMOD) {
+                        if self.volume > 0 {
+                            self.volume -= 1;
+                            mixer::Music::set_volume(self.volume as i32);
+                            self.storage.set_volume(self.volume);
+                        }
+                    } else {
+                        self.position.y += 32;
+                        moved = true;
+                    }
+                }
+                _ => {}
+            },
+            _ => {}
+        }
+        moved
+    }
+
+    fn wrap_position(&mut self, canvas_size: (u32, u32)) {
+        if self.position.x < 0 {
+            self.position.x = canvas_size.0 as i32 - 32;
+        } else if self.position.x >= canvas_size.0 as i32 {
+            self.position.x = 0;
+        }
+        if self.position.y < 0 {
+            self.position.y = canvas_size.1 as i32 - 32;
+        } else if self.position.y >= canvas_size.1 as i32 {
+            self.position.y = 0;
+        }
+    }
+
+    fn update_fps(&mut self) {
+        let duration = Duration::from_secs_f64(now() - self.prev_time);
+        let fps = 1.0 / duration.as_secs_f64();
+        self.prev_time = now();
+
+        self.frame_count += 1;
+        let a = 1.0 / self.frame_count as f64;
+        self.avg_fps = a * fps + (1.0 - a) * self.avg_fps;
+    }
+
+    fn update_focus(&mut self, focused: bool) {
+        if focused != self.previous_focus {
+            if focused {
+                println!("Focus gained");
+            } else {
+                println!("Focus lost");
+            }
+            self.previous_focus = focused;
+        }
+    }
+}
+
 fn main() {
     hide_console_window();
 
-    let ctx = sdl2::init().unwrap();
-    let video_ctx = ctx.video().unwrap();
-    let mut window_size = Point::new(640, 480);
+    let ctx = sdl2::init().expect("failed to initialize SDL2");
+    let video_ctx = ctx.video().expect("failed to initialize SDL2 video");
+    let window_size = Point::new(640, 480);
 
-    let window = match video_ctx
+    let window = video_ctx
         .window("rust-sdl2-emscripten", window_size.x as u32, window_size.y as u32)
         .position_centered()
         .resizable()
         .allow_highdpi()
         .opengl()
         .build()
-    {
-        Ok(window) => window,
-        Err(err) => panic!("failed to create window: {}", err),
-    };
+        .expect("failed to create window");
 
-    let mut canvas = match window.into_canvas().accelerated().build() {
-        Ok(canvas) => canvas,
-        Err(err) => panic!("failed to create canvas: {}", err),
-    };
+    let mut canvas = window.into_canvas().accelerated().build().expect("failed to create canvas");
 
     let texture_creator = canvas.texture_creator();
-    let mut point = Point::new(0, 0);
-
     let ttf_ctx = ttf_context();
 
-    mixer::open_audio(44_100, sdl2::mixer::AUDIO_S16LSB, sdl2::mixer::DEFAULT_CHANNELS, 1024).unwrap();
+    mixer::open_audio(44_100, sdl2::mixer::AUDIO_S16LSB, sdl2::mixer::DEFAULT_CHANNELS, 1024)
+        .expect("failed to open audio device");
 
-    let mut storage = store::Store::new();
+    let mut state = GameState::new(window_size);
 
-    let mut volume = storage.volume().map_or_else(
-        || {
-            println!("No volume stored, using default");
-            1
-        },
-        |v| v,
-    );
-    println!("Volume: {}", volume);
-    mixer::Music::set_volume(volume as i32);
+    let music_data = RWops::from_bytes(MUSIC_DATA).expect("failed to load music data");
+    let music = mixer::LoaderRWops::load_music(&music_data).expect("failed to load music");
+    music.play(-1).expect("failed to play music");
 
-    let music_data = RWops::from_bytes(MUSIC_DATA).unwrap();
-    let music = mixer::LoaderRWops::load_music(&music_data).unwrap();
-    music.play(-1).unwrap();
-
-    let mut prev = now();
-
-    let font = ttf_ctx.load_font("./assets/TerminalVector.ttf", 12).unwrap();
-
-    let fruit_atlas = texture_creator
-        .load_texture("./assets/fruit.png")
-        .expect("could not load texture");
+    let font = ttf_ctx.load_font("./assets/TerminalVector.ttf", 12).expect("failed to load font");
+    let fruit_atlas = texture_creator.load_texture("./assets/fruit.png").expect("could not load texture");
 
     let target_fps = 60;
     let frame_time = Duration::from_secs_f32(1.0) / target_fps;
-    let mut frame = 0;
 
-    let mut n = 0;
-    let mut avg_fps = 0f64;
-
-    let mut mouse = Point::new(0, 0);
-    let mut previous_focus = false;
-
-    loop {
+    while state.running {
         let start = now();
         let mut moved = false;
 
+        let keyboard_mod = ctx.keyboard().mod_state();
         for event in ctx.event_pump().unwrap().poll_iter() {
-            match event {
-                Event::MouseMotion { x, y, .. } => {
-                    mouse = Point::new(x, y);
-                }
-                Event::Window { win_event, .. } => match win_event {
-                    sdl2::event::WindowEvent::Resized(w, h) => {
-                        println!("Resized to {}x{}", w, h);
-                        window_size.x = w;
-                        window_size.y = h;
-                        canvas.window_mut().set_size(w as u32, h as u32).unwrap();
-                    }
-                    _ => {}
-                },
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::ESCAPE),
-                    ..
-                } => {
-                    process::exit(1);
-                }
-                Event::KeyDown { keycode: Some(key), .. } => match key {
-                    Keycode::SPACE => {
-                        frame += 1;
-                        if frame > 7 {
-                            frame = 0;
-                        }
-                    }
-                    Keycode::LEFT => {
-                        point.x -= 32;
-                        moved = true;
-                    }
-                    Keycode::RIGHT => {
-                        point.x += 32;
-                        moved = true;
-                    }
-                    Keycode::UP => {
-                        if ctx.keyboard().mod_state().contains(sdl2::keyboard::Mod::LSHIFTMOD) {
-                            if volume < 128 {
-                                volume += 1;
-                                mixer::Music::set_volume(volume as i32);
-                                storage.set_volume(volume);
-                            }
-                        } else {
-                            point.y -= 32;
-                            moved = true;
-                        }
-                    }
-                    Keycode::DOWN => {
-                        if ctx.keyboard().mod_state().contains(sdl2::keyboard::Mod::LSHIFTMOD) {
-                            if volume > 0 {
-                                volume -= 1;
-                                mixer::Music::set_volume(volume as i32);
-                                storage.set_volume(volume);
-                            }
-                        } else {
-                            point.y += 32;
-                            moved = true;
-                        }
-                    }
-                    _ => {}
-                },
-                _ => {}
-            }
+            moved |= state.handle_event(event, keyboard_mod);
         }
 
-        // Handle wrapping at the edges
         if moved {
             let canvas_size = canvas.window().size();
-            if point.x < 0 {
-                point.x = canvas_size.0 as i32 - 32;
-            } else if point.x >= canvas_size.0 as i32 {
-                point.x = 0;
-            }
-            if point.y < 0 {
-                point.y = canvas_size.1 as i32 - 32;
-            } else if point.y >= canvas_size.1 as i32 {
-                point.y = 0;
-            }
+            state.wrap_position(canvas_size);
         }
 
         canvas.set_draw_color(BLACK);
         canvas.clear();
 
         let focused = ctx.mouse().focused_window_id().is_some();
-        if focused != previous_focus {
-            if focused {
-                println!("Focus gained");
-            } else {
-                println!("Focus lost");
-            }
-            previous_focus = focused;
-        }
+        state.update_focus(focused);
 
-        // Draw a 32x32 square at the mouse position
         if focused {
-            let mouse_x = (mouse.x / 32 * 32) as i16;
-            let mouse_y = (mouse.y / 32 * 32) as i16;
+            let mouse_x = (state.mouse.x / 32 * 32) as i16;
+            let mouse_y = (state.mouse.y / 32 * 32) as i16;
             let color = Color::RGB(255, 255, 255);
-
             let _ = canvas.line(mouse_x, mouse_y, mouse_x + 32, mouse_y, color);
             let _ = canvas.line(mouse_x + 32, mouse_y, mouse_x + 32, mouse_y + 32, color);
             let _ = canvas.line(mouse_x + 32, mouse_y + 32, mouse_x, mouse_y + 32, color);
@@ -243,8 +271,8 @@ fn main() {
         canvas
             .copy_ex(
                 &fruit_atlas,
-                Rect::new(32 * frame, 0, 32, 32),
-                Rect::new(point.x, point.y, 32, 32),
+                Rect::new(32 * state.frame, 0, 32, 32),
+                Rect::new(state.position.x, state.position.y, 32, 32),
                 0.0,
                 Some(Point::new(0, 0)),
                 false,
@@ -252,14 +280,13 @@ fn main() {
             )
             .unwrap();
 
-        // draw fps counter
-        let text = format!("{:.0}", avg_fps);
+        let text = format!("{:.0}", state.avg_fps);
         let surface = font.render(&text).blended(Color::RGBA(255, 255, 255, 50)).unwrap();
         let texture = texture_creator.create_texture_from_surface(&surface).unwrap();
         let _ = canvas.copy(
             &texture,
             None,
-            Rect::new(window_size.x - (25i32 * text.len() as i32), 0, 25 * text.len() as u32, 40),
+            Rect::new(state.window_size.x - (25i32 * text.len() as i32), 0, 25 * text.len() as u32, 40),
         );
 
         canvas.present();
@@ -274,13 +301,6 @@ fn main() {
             println!("! excess: {:?} ({:?})", excess, t2);
         }
 
-        let duration = Duration::from_secs_f64(now() - prev);
-        let fps = 1f64 / (duration.as_secs_f64());
-        prev = now();
-
-        n += 1;
-        let a = 1f64 / n as f64;
-        let b = 1f64 - a;
-        avg_fps = a * fps + b * avg_fps;
+        state.update_fps();
     }
 }
