@@ -46,7 +46,6 @@ impl Store {
 
 #[cfg(target_os = "emscripten")]
 extern "C" {
-    pub fn emscripten_run_script(script: *const libc::c_char);
     pub fn emscripten_run_script_string(script: *const libc::c_char) -> *mut libc::c_char;
 }
 
@@ -67,15 +66,6 @@ impl Store {
         // Use local storage to set volume
         let script = format!("localStorage.setItem('volume', '{}')", volume);
         Store::run_script_string(&script);
-    }
-
-    fn run_script(script: &str) {
-        use std::ffi::CString;
-
-        let script = CString::new(script).unwrap();
-        unsafe {
-            emscripten_run_script(script.as_ptr());
-        }
     }
 
     fn run_script_string(script: &str) -> String {

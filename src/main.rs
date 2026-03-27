@@ -1,4 +1,3 @@
-// #![windows_subsystem = "windows"]
 use std::process;
 use std::time::Duration;
 
@@ -12,7 +11,6 @@ use sdl2::rect::{Point, Rect};
 use sdl2::rwops::RWops;
 use sdl2::ttf;
 
-// static FONT_DATA: &[u8] = include_bytes!("../assets/TerminalVector.ttf");
 static MUSIC_DATA: &[u8] = include_bytes!("../assets/tetris.ogg");
 static BLACK: Color = Color::RGB(0, 0, 0);
 
@@ -28,7 +26,7 @@ fn sleep(ms: u32) {
 
 #[cfg(target_os = "emscripten")]
 fn now() -> f64 {
-    emscripten::emscripten::now() / 1000f64
+    emscripten::now() / 1000f64
 }
 
 #[cfg(not(target_os = "emscripten"))]
@@ -41,7 +39,7 @@ fn now() -> f64 {
 
 #[cfg(target_os = "emscripten")]
 fn sleep(ms: u32) {
-    emscripten::emscripten::sleep(ms);
+    emscripten::sleep(ms);
 }
 
 #[cfg(not(target_os = "emscripten"))]
@@ -115,10 +113,6 @@ fn main() {
     music.play(-1).unwrap();
 
     let mut prev = now();
-
-    // let font_data = RWops::from_bytes(FONT_DATA).unwrap();
-    // let font_size = 12;
-    // let font = ttf_ctx.load_font_from_rwops(font_data, font_size).unwrap();
 
     let font = ttf_ctx.load_font("./assets/TerminalVector.ttf", 12).unwrap();
 
@@ -245,7 +239,6 @@ fn main() {
             let _ = canvas.line(mouse_x + 32, mouse_y + 32, mouse_x, mouse_y + 32, color);
             let _ = canvas.line(mouse_x, mouse_y + 32, mouse_x, mouse_y, color);
         }
-        // canvas.line(top_left.x as i16, top_left.y as i16, top_left.x as i16 + 32, top_left.y as i16 + 32, color);
 
         canvas
             .copy_ex(
