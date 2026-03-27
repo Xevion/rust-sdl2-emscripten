@@ -10,7 +10,6 @@ all = { level = "deny" }
 opt-level = "z"
 lto = true
 strip = true
-panic = "abort"
 
 [dependencies]
 sdl2 = { version = "0.38", features = ["image", "ttf", "mixer", "gfx"] }
