@@ -2,7 +2,7 @@
 # See README.md "Notes" section for documentation on each flag.
 [target.wasm32-unknown-emscripten]
 rustflags = [
-    "-C", "link-args=-sASYNCIFY -sALLOW_MEMORY_GROWTH=1",
+    "-C", "link-args=-sASYNCIFY -sALLOW_MEMORY_GROWTH=1 -sSUPPORT_LONGJMP=emscripten",
     "-C", "link-args=-sUSE_SDL=2 -sUSE_SDL_IMAGE=2 -sUSE_SDL_MIXER=2 -sUSE_OGG=1 -sUSE_SDL_GFX=2 -sUSE_SDL_TTF=2 -sSDL2_IMAGE_FORMATS=['png']",
     "-C", "link-args=--preload-file assets/",
 ]
